@@ -60,3 +60,15 @@ script:
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: jirikuncar
+  password:
+    secure: Xpbb2TK9XXybaU4QEfk+9XxB/rJCwd269drfZTrPv7mTYHFHN77Go99xpkq5DXa5w33A2Bo7e+OUg/+WkNaXe22xwx/BdR9+e7WsKCntjKxsTZqAGQBCUdwyIY07sWzF9SnHAvE4f+nZCRcgOZZh1wc0xxSt2XY+Pp7mY2EnRkPlGp/xbiFzzUuWTyHHD15FbOsV1BxUivxNXTG36MoD6726zubhvJP7p/iAlb0X79ZByPCFCk+7ZlGalHcTB/xDMj3O/H5RFhcuxmyAGyBkGeQfEjLfE9Elt/LK6ikgDocU7ynlaUO/qPTJfKQCl3KVkDIGdP2Z8iW5WVp8/jE2/XaCmo+Lf7KJjShjGVVdn/4P2kUvhmiT3PFV8CuNIMA+rvaOHEycfAsSIe0amCW+fuiGehdQdE/2OkNpU3jKDXuL0i2jrY7682IddMr1LYpoUgZiUXNIyzgo5G5O7s1dOmCEQ6x59PD8s3M6L9RibdXagQ/4+qkmXtVvW1Z+6gJsiWbZe5RzGDHZE4B1wwPT/Dt8gevMcPU8vbBTPTpgaJOyO39A1lTo4jNcINbODMBnsr3u3OT/ISnbWQ2Xwmxdsukz0n7ktAes20IynUMkV7vPiRbEY1/rChcoKIUE+K0wKv9evy/vLz9WhmZXd+MBBwix+zN+VK4UfxZJzkH7N7U=
+  distributions: sdist bdist_wheel
+  on:
+    condition: $REQUIREMENTS = release
+    python: "2.7"
+    repo: inveniosoftware/invenio-records-files
+    tags: true

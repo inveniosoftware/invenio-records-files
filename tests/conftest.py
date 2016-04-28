@@ -34,7 +34,6 @@ import tempfile
 from time import sleep
 
 import pytest
-from elasticsearch.exceptions import RequestError
 from flask import Flask
 from flask_cli import FlaskCLI
 from invenio_db import db as db_
@@ -42,7 +41,6 @@ from invenio_db import InvenioDB
 from invenio_files_rest import InvenioFilesREST
 from invenio_files_rest.models import Location
 from invenio_records import InvenioRecords
-from invenio_records_rest import InvenioRecordsREST
 from six import BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists
 
@@ -64,7 +62,6 @@ def app(request):
     FlaskCLI(app_)
     InvenioDB(app_)
     InvenioRecords(app_)
-    InvenioRecordsREST(app_)
     InvenioFilesREST(app_)
 
     with app_.app_context():
