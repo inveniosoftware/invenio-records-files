@@ -27,4 +27,4 @@ Authors
 
 Invenio modules that integrates records and files.
 
-- CERN <info@invenio-software.org>
+- Jiri Kuncar <jiri.kuncar@cern.ch>
