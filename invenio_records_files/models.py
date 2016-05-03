@@ -55,6 +55,10 @@ class RecordsBuckets(db.Model):
     bucket = db.relationship(Bucket)
     record = db.relationship(
         RecordMetadata,
-        backref=db.backref('records_buckets', uselist=False),
+        backref=db.backref(
+            'records_buckets',
+            uselist=False,
+            cascade='all, delete-orphan',
+        ),
         uselist=False,
     )

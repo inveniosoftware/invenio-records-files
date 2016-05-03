@@ -27,11 +27,9 @@
 
 from __future__ import absolute_import, print_function
 
-import datetime
 import os
 import shutil
 import tempfile
-from time import sleep
 
 import pytest
 from flask import Flask
@@ -90,3 +88,25 @@ def location(app):
         loc = Location(name='local', uri=tmppath, default=True)
         db_.session.add(loc)
     db_.session.commit()
+
+
+@pytest.fixture()
+def record(app):
+    """Create a record."""
+    record = {
+        'title': 'fuu'
+    }
+    record = Record.create(record)
+    record.commit()
+    db_.session.commit()
+    return record
+
+
+@pytest.fixture()
+def generic_file(app, record):
+    """Add a generic file to the record."""
+    stream = BytesIO(b'test example')
+    filename = 'generic_file.txt'
+    record.files[filename] = stream
+    db_.session.commit()
+    return filename
