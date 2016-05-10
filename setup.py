@@ -93,6 +93,9 @@ setup(
         'invenio_db.models': [
             'invenio_records_files = invenio_records_files.models',
         ],
+        'invenio_jsonschemas.schemas': [
+            'records_files = invenio_records_files.jsonschemas',
+        ],
     },
     extras_require=extras_require,
     install_requires=install_requires,

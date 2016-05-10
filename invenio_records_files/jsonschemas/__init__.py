@@ -22,21 +22,4 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-
-include *.rst
-include *.sh
-include *.txt
-include .dockerignore
-include .editorconfig
-include .tx/config
-include LICENSE
-include babel.ini
-include pytest.ini
-recursive-include docs *.bat
-recursive-include docs *.py
-recursive-include docs *.rst
-recursive-include docs Makefile
-recursive-include examples *.py
-recursive-include invenio_records_files *.po *.pot *.mo
-recursive-include invenio_records_files *.json 
-recursive-include tests *.py
+"""Invenio-Records-Files JSON Schemas."""
