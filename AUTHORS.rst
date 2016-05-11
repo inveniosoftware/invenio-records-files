@@ -28,4 +28,5 @@ Authors
 Invenio modules that integrates records and files.
 
 - Jiri Kuncar <jiri.kuncar@cern.ch>
+- Leonardo Rossi <leonardo.r@cern.ch>
 - Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
