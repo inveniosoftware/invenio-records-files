@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from invenio_files_rest.models import ObjectVersion
+from invenio_records.errors import MissingModelError
 
 
 def sorted_files_from_bucket(bucket, keys=None):
@@ -36,3 +37,17 @@ def sorted_files_from_bucket(bucket, keys=None):
     sortby = dict(zip(keys, range(total)))
     values = ObjectVersion.get_by_bucket(bucket).all()
     return sorted(values, key=lambda x: sortby.get(x.key, total))
+
+
+def record_file_factory(pid, record, filename):
+    """Get file from a record."""
+    try:
+        if not (hasattr(record, 'files') and record.files):
+            return None
+    except MissingModelError:
+        return None
+
+    try:
+        return record.files[filename]
+    except KeyError:
+        return None

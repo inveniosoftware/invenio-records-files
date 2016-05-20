@@ -24,15 +24,14 @@
 
 """API for manipulating files associated to a record."""
 
+from collections import OrderedDict
 from functools import wraps
 
-from flask import current_app
 from invenio_db import db
 from invenio_files_rest.errors import InvalidOperationError
-from invenio_files_rest.models import Bucket, ObjectVersion
+from invenio_files_rest.models import ObjectVersion
 from invenio_records.api import Record as _Record
 from invenio_records.errors import MissingModelError
-from sqlalchemy.exc import IntegrityError
 
 from .models import RecordsBuckets
 from .utils import sorted_files_from_bucket
@@ -41,14 +40,14 @@ from .utils import sorted_files_from_bucket
 class FileObject(object):
     """Wrapper for files."""
 
-    def __init__(self, bucket, obj):
+    def __init__(self, obj, data):
         """Bind to current bucket."""
         self.obj = obj
-        self.bucket = bucket
+        self.data = data
 
     def get_version(self, version_id=None):
         """Return specific version ``ObjectVersion`` instance or HEAD."""
-        return ObjectVersion.get(bucket=self.bucket, key=self.obj.key,
+        return ObjectVersion.get(bucket=self.obj.bucket, key=self.obj.key,
                                  version_id=version_id)
 
     def __getattr__(self, key):
@@ -56,8 +55,27 @@ class FileObject(object):
         return getattr(self.obj, key)
 
     def __getitem__(self, key):
-        """Proxy to ``obj``."""
-        return getattr(self.obj, key)
+        """Proxy to ``obj`` and ``data``."""
+        if hasattr(self.obj, key):
+            return getattr(self.obj, key)
+        return self.data[key]
+
+    def __setitem__(self, key, value):
+        """Proxy to ``data``."""
+        if hasattr(self.obj, key):
+            raise KeyError(key)
+        self.data[key] = value
+
+    def dumps(self):
+        """Create a dump."""
+        self.data.update({
+            'bucket': str(self.obj.bucket_id),
+            'checksum': self.obj.file.checksum,
+            'key': self.obj.key,  # IMPORTANT it must stay here!
+            'size': self.obj.file.size,
+            'version_id': str(self.obj.version_id),
+        })
+        return self.data
 
 
 def _writable(method):
@@ -80,13 +98,15 @@ class FilesIterator(object):
         self.record = record
         self.model = record.model
         self.bucket = bucket
-
         self.record.setdefault('_files', [])
+        self.filesmap = OrderedDict([
+            (f['key'], f) for f in self.record['_files']
+        ])
 
     @property
     def keys(self):
         """Return file keys."""
-        return [file_['key'] for file_ in self.record['_files']]
+        return self.filesmap.keys()
 
     def __len__(self):
         """Get number of files."""
@@ -94,9 +114,7 @@ class FilesIterator(object):
 
     def __iter__(self):
         """Get iterator."""
-        self._it = iter(sorted_files_from_bucket(
-            self.bucket, self.keys
-        ))
+        self._it = iter(sorted_files_from_bucket(self.bucket, self.keys))
         return self
 
     def next(self):
@@ -106,7 +124,7 @@ class FilesIterator(object):
     def __next__(self):
         """Get next file item."""
         obj = next(self._it)
-        return FileObject(self.bucket, obj)
+        return FileObject(obj, self.filesmap.get(obj.key, {}))
 
     def __contains__(self, key):
         """Test if file exists."""
@@ -117,62 +135,72 @@ class FilesIterator(object):
         """Get a specific file."""
         obj = ObjectVersion.get(self.bucket, key)
         if obj:
-            return FileObject(self.bucket, obj)
+            return FileObject(obj, self.filesmap.get(obj.key, {}))
         raise KeyError(key)
+
+    def flush(self):
+        """Flush changes to record."""
+        self.record['_files'] = list(self.filesmap.values())
 
     @_writable
     def __setitem__(self, key, stream):
         """Add file inside a deposit."""
         with db.session.begin_nested():
             # save the file
-            obj = ObjectVersion.create(bucket=self.bucket, key=key,
-                                       stream=stream)
-
-            # update deposit['_files']
-            if key not in self.record['_files']:
-                self.record['_files'].append({'key': key})
+            obj = ObjectVersion.create(
+                bucket=self.bucket, key=key, stream=stream)
+            self.filesmap[key] = FileObject(obj, {}).dumps()
+            self.flush()
 
     @_writable
     def __delitem__(self, key):
         """Delete a file from the deposit."""
         obj = ObjectVersion.delete(bucket=self.bucket, key=key)
-        self.record['_files'] = [file_ for file_ in self.record['_files']
-                                 if file_['key'] != key]
+
         if obj is None:
             raise KeyError(key)
 
+        if key in self.filesmap:
+            del self.filesmap[key]
+            self.flush()
+
     def sort_by(self, *ids):
         """Update files order."""
-        files = {str(f_.file_id): f_.key for f_ in self}
-        self.record['_files'] = [{'key': files.get(id_, id_)} for id_ in ids]
+        assert len(self.filesmap) == len(ids)
+
+        self.filesmap = OrderedDict([(f['key'], f) for f in sorted(
+            self.filesmap.values(),
+            key=lambda x: ids.index(x['key'])
+        )])
+        self.flush()
 
     @_writable
     def rename(self, old_key, new_key):
         """Rename a file."""
         assert new_key not in self
+        assert old_key != new_key
 
         file_ = self[old_key]
-        # create a new version with the new name
+        old_data = self.filesmap[old_key]
+
+        # Create a new version with the new name
         obj = ObjectVersion.create(
             bucket=self.bucket, key=new_key,
             _file_id=file_.obj.file_id
         )
-        self.record['_files'][self.keys.index(old_key)]['key'] = new_key
-        # delete the old version
-        ObjectVersion.delete(bucket=self.bucket, key=old_key)
+
+        # Delete old key
+        self.filesmap[new_key] = FileObject(obj, old_data).dumps()
+        del self[old_key]
+
         return obj
 
     def dumps(self, bucket=None):
         """Serialize files from a bucket."""
-        return [{
-            'bucket': str(file_.bucket_id),
-            'checksum': file_.file.checksum,
-            'key': file_.key,  # IMPORTANT it must stay here!
-            'size': file_.file.size,
-            'version_id': str(file_.version_id),
-        } for file_ in sorted_files_from_bucket(
-            bucket or self.bucket, self.keys
-        )]
+        return [
+            FileObject(o, self.filesmap.get(o.key, {})).dumps()
+            for o in sorted_files_from_bucket(bucket or self.bucket, self.keys)
+        ]
 
 
 class FilesMixin(object):
@@ -183,7 +211,7 @@ class FilesMixin(object):
 
         .. note:: Reimplement in children class for custom behavior.
         """
-        return Bucket.create()
+        return None
 
     @property
     def files(self):
@@ -192,13 +220,13 @@ class FilesMixin(object):
             raise MissingModelError()
 
         if not self.model.records_buckets:
-            try:
-                self.model.records_buckets = RecordsBuckets(
-                    bucket=self._create_bucket()
-                )
-            except IntegrityError:
-                current_app.logger.exception('Check default bucket location.')
+            bucket = self._create_bucket()
+            if not bucket:
                 return None
+
+            self.model.records_buckets = RecordsBuckets(
+                bucket=bucket
+            )
 
         return FilesIterator(self, bucket=self.model.records_buckets.bucket)
 

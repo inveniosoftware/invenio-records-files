@@ -37,12 +37,12 @@ from flask_cli import FlaskCLI
 from invenio_db import db as db_
 from invenio_db import InvenioDB
 from invenio_files_rest import InvenioFilesREST
-from invenio_files_rest.models import Location
+from invenio_files_rest.models import Bucket, Location
 from invenio_records import InvenioRecords
 from six import BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists
 
-from invenio_records_files.api import Record
+from invenio_records_files.api import Record, RecordsBuckets
 
 
 @pytest.yield_fixture()
@@ -80,25 +80,42 @@ def db(app):
 
 
 @pytest.fixture()
-def location(app):
+def location(app, db):
     """Create default location."""
     tmppath = tempfile.mkdtemp()
-    with db_.session.begin_nested():
+    with db.session.begin_nested():
         Location.query.delete()
         loc = Location(name='local', uri=tmppath, default=True)
-        db_.session.add(loc)
-    db_.session.commit()
+        db.session.add(loc)
+    db.session.commit()
+    return loc
 
 
 @pytest.fixture()
-def record(app):
+def record(app, db):
     """Create a record."""
     record = {
         'title': 'fuu'
     }
     record = Record.create(record)
     record.commit()
-    db_.session.commit()
+    db.session.commit()
+    return record
+
+
+@pytest.fixture()
+def bucket(location, db):
+    """Create a bucket."""
+    b = Bucket.create()
+    db.session.commit()
+    return b
+
+
+@pytest.fixture()
+def record_with_bucket(record, bucket, db):
+    """Create a bucket."""
+    record.model.records_buckets = RecordsBuckets(bucket=bucket)
+    db.session.commit()
     return record
 
 
