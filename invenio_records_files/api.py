@@ -204,7 +204,13 @@ class FilesIterator(object):
 
 
 class FilesMixin(object):
-    """Implement files attribute for Record models."""
+    """Implement files attribute for Record models.
+
+    .. note::
+
+       Implement ``_create_bucket()`` in subclass to allow files property
+       to automatically create a bucket in case no bucket is present.
+    """
 
     def _create_bucket(self):
         """Return an instance of ``Bucket`` class.

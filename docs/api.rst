@@ -25,6 +25,20 @@
 API Docs
 ========
 
-invenio_records_files
----------------------
+Record API
+----------
+.. automodule:: invenio_records_files.api
+   :members:
+   :undoc-members:
 
+Utilities
+---------
+.. automodule:: invenio_records_files.utils
+   :members:
+   :undoc-members:
+
+Models
+------
+.. automodule:: invenio_records_files.models
+   :members:
+   :undoc-members:
