@@ -225,17 +225,28 @@ class FilesMixin(object):
         if self.model is None:
             raise MissingModelError()
 
-        if not self.model.records_buckets:
+        records_buckets = RecordsBuckets.query.filter_by(
+            record_id=self.id).first()
+
+        if not records_buckets:
             bucket = self._create_bucket()
             if not bucket:
                 return None
+            RecordsBuckets.create(record=self.model, bucket=bucket)
+        else:
+            bucket = records_buckets.bucket
 
-            self.model.records_buckets = RecordsBuckets(
-                bucket=bucket
-            )
-
-        return FilesIterator(self, bucket=self.model.records_buckets.bucket)
+        return FilesIterator(self, bucket=bucket)
 
 
 class Record(_Record, FilesMixin):
     """Define API for files manipulation using ``FilesMixin``."""
+
+    def delete(self, force=False):
+        """Delete a record and also remove the RecordsBuckets if necessary."""
+        if force:
+            RecordsBuckets.query.filter_by(
+                record=self.model,
+                bucket=self.files.bucket
+            ).delete()
+        super(Record, self).delete(force)

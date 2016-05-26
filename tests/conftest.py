@@ -114,7 +114,7 @@ def bucket(location, db):
 @pytest.fixture()
 def record_with_bucket(record, bucket, db):
     """Create a bucket."""
-    record.model.records_buckets = RecordsBuckets(bucket=bucket)
+    RecordsBuckets.create(bucket=bucket, record=record.model)
     db.session.commit()
     return record
 

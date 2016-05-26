@@ -94,7 +94,7 @@ You assign a bucket to a record through
 >>> from invenio_files_rest.models import Bucket
 >>> from invenio_records_files.models import RecordsBuckets
 >>> bucket = Bucket.create()
->>> record.model.records_buckets = RecordsBuckets(bucket=bucket)
+>>> record_buckets = RecordsBuckets.create(record=record.model, bucket=bucket)
 
 Normally the bucket creation and bucket to record assignment is done by an
 external module (e.g. Invenio-Deposit is one example of this).

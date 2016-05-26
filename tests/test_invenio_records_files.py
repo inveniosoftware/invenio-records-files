@@ -44,6 +44,11 @@ def test_version():
     assert __version__
 
 
+def test_jsonschemas_import():
+    """Test jsonschemas import"""
+    from invenio_records_files import jsonschemas
+
+
 def test_missing_location(app, db):
     """Test missing location."""
     assert Record.create({}).files is None
@@ -55,7 +60,7 @@ def test_files_property(app, db, location, bucket):
         Record({}).files
 
     record = Record.create({})
-    record.model.records_buckets = RecordsBuckets(bucket=bucket)
+    RecordsBuckets.create(bucket=bucket, record=record.model)
 
     assert 0 == len(record.files)
     assert 'invalid' not in record.files
@@ -212,5 +217,5 @@ def test_record_files_factory(app, db, location, record_with_bucket):
     assert record_file_factory(None, Record({}), 'invalid') is None
     assert record_file_factory(None, BaseRecord({}), 'invalid') is None
     baserecord = BaseRecord.create({})
-    baserecord.model.records_buckets = RecordsBuckets(bucket=Bucket.create())
+    RecordsBuckets(bucket=Bucket.create(), record=baserecord)
     assert record_file_factory(None, baserecord, 'invalid') is None

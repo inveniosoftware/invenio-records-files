@@ -53,12 +53,11 @@ class RecordsBuckets(db.Model):
     )
 
     bucket = db.relationship(Bucket)
-    record = db.relationship(
-        RecordMetadata,
-        backref=db.backref(
-            'records_buckets',
-            uselist=False,
-            cascade='all, delete-orphan',
-        ),
-        uselist=False,
-    )
+    record = db.relationship(RecordMetadata)
+
+    @classmethod
+    def create(cls, record, bucket):
+        """Create a new RecordsBuckets and adds it to the session."""
+        rb = cls(record=record, bucket=bucket)
+        db.session.add(rb)
+        return rb
