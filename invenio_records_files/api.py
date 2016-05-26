@@ -166,12 +166,13 @@ class FilesIterator(object):
 
     def sort_by(self, *ids):
         """Update files order."""
-        assert len(self.filesmap) == len(ids)
-
-        self.filesmap = OrderedDict([(f['key'], f) for f in sorted(
-            self.filesmap.values(),
-            key=lambda x: ids.index(x['key'])
-        )])
+        # Support sorting by file_ids or keys.
+        files = {str(f_.file_id): f_.key for f_ in self}
+        # self.record['_files'] = [{'key': files.get(id_, id_)} for id_ in ids]
+        self.filesmap = OrderedDict([
+            (files.get(id_, id_), self[files.get(id_, id_)].dumps())
+            for id_ in ids
+        ])
         self.flush()
 
     @_writable
@@ -249,4 +250,4 @@ class Record(_Record, FilesMixin):
                 record=self.model,
                 bucket=self.files.bucket
             ).delete()
-        super(Record, self).delete(force)
+        return super(Record, self).delete(force)
