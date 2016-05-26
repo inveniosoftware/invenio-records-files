@@ -50,6 +50,12 @@ class FileObject(object):
         return ObjectVersion.get(bucket=self.obj.bucket, key=self.obj.key,
                                  version_id=version_id)
 
+    def get(self, key, default=None):
+        """Proxy to ``obj``."""
+        if hasattr(self.obj, key):
+            return getattr(self.obj, key)
+        return self.data.get(key, default)
+
     def __getattr__(self, key):
         """Proxy to ``obj``."""
         return getattr(self.obj, key)
@@ -140,7 +146,7 @@ class FilesIterator(object):
 
     def flush(self):
         """Flush changes to record."""
-        self.record['_files'] = list(self.filesmap.values())
+        self.record['_files'] = self.dumps()
 
     @_writable
     def __setitem__(self, key, stream):

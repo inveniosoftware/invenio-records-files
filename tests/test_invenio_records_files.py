@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 from invenio_files_rest.errors import InvalidOperationError
-from invenio_files_rest.models import Bucket
+from invenio_files_rest.models import Bucket, ObjectVersion
 from invenio_records.api import Record as BaseRecord
 from invenio_records.errors import MissingModelError
 from six import BytesIO
@@ -134,6 +134,8 @@ def test_files_extra_data(app, db, location, record_with_bucket):
     # Set some metadata
     record.files['hello.txt']['type'] = 'txt'
     assert record.files['hello.txt']['type'] == 'txt'
+    assert record.files['hello.txt'].get('type') == 'txt'
+    assert record.files['hello.txt'].get('invalid', 'default') == 'default'
     assert record['_files'][0]['type'] == 'txt'
 
     # Dump it and get it again
@@ -149,6 +151,7 @@ def test_files_extra_data(app, db, location, record_with_bucket):
             assert False, "Could set a protected key {0}".format(k)
         except KeyError:
             pass
+        assert record.files['hello.txt'].get(k)
 
 
 def test_files_protection(app, db, location, record_with_bucket):
@@ -187,6 +190,29 @@ def test_filesmixin(app, db, location, record):
 
     record = Record.create({})
     assert record.files is None
+
+
+def test_bucket_modification(app, db, location, bucket,
+                             record_with_bucket):
+    """Test direct modification of bucket."""
+    record = record_with_bucket
+
+    record.files['hello.txt'] = BytesIO(b'Hello world!')
+    record.files['hello.txt']['type'] = 'txt'
+
+    # Modify bucket outside of record.files property
+    ObjectVersion.create(bucket, 'second.txt', stream=BytesIO(b'Second'))
+
+    # Bucket and record are out of sync:
+    assert len(record.files) == 2
+    assert len(record['_files']) == 1
+
+    # Flush changes to ensure they are in sync.
+    record.files.flush()
+    assert len(record['_files']) == 2
+
+    # Check that extra metadata is not overwritten.
+    assert [f.get('type') for f in record.files] == ['txt', None]
 
 
 def test_get_version(app, db, location, record_with_bucket):
