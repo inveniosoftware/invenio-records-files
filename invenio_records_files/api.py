@@ -98,11 +98,12 @@ def _writable(method):
 class FilesIterator(object):
     """Iterator for files."""
 
-    def __init__(self, record, bucket):
+    def __init__(self, record, bucket=None, file_cls=None):
         """Initialize iterator."""
         self._it = None
         self.record = record
         self.model = record.model
+        self.file_cls = file_cls or FileObject
         self.bucket = bucket
         self.record.setdefault('_files', [])
         self.filesmap = OrderedDict([
@@ -130,7 +131,7 @@ class FilesIterator(object):
     def __next__(self):
         """Get next file item."""
         obj = next(self._it)
-        return FileObject(obj, self.filesmap.get(obj.key, {}))
+        return self.file_cls(obj, self.filesmap.get(obj.key, {}))
 
     def __contains__(self, key):
         """Test if file exists."""
@@ -141,7 +142,7 @@ class FilesIterator(object):
         """Get a specific file."""
         obj = ObjectVersion.get(self.bucket, key)
         if obj:
-            return FileObject(obj, self.filesmap.get(obj.key, {}))
+            return self.file_cls(obj, self.filesmap.get(obj.key, {}))
         raise KeyError(key)
 
     def flush(self):
@@ -155,7 +156,7 @@ class FilesIterator(object):
             # save the file
             obj = ObjectVersion.create(
                 bucket=self.bucket, key=key, stream=stream)
-            self.filesmap[key] = FileObject(obj, {}).dumps()
+            self.filesmap[key] = self.file_cls(obj, {}).dumps()
             self.flush()
 
     @_writable
@@ -197,7 +198,7 @@ class FilesIterator(object):
         )
 
         # Delete old key
-        self.filesmap[new_key] = FileObject(obj, old_data).dumps()
+        self.filesmap[new_key] = self.file_cls(obj, old_data).dumps()
         del self[old_key]
 
         return obj
@@ -205,7 +206,7 @@ class FilesIterator(object):
     def dumps(self, bucket=None):
         """Serialize files from a bucket."""
         return [
-            FileObject(o, self.filesmap.get(o.key, {})).dumps()
+            self.file_cls(o, self.filesmap.get(o.key, {})).dumps()
             for o in sorted_files_from_bucket(bucket or self.bucket, self.keys)
         ]
 
@@ -218,6 +219,9 @@ class FilesMixin(object):
        Implement ``_create_bucket()`` in subclass to allow files property
        to automatically create a bucket in case no bucket is present.
     """
+
+    file_cls = FileObject
+    files_iter_cls = FilesIterator
 
     def _create_bucket(self):
         """Return an instance of ``Bucket`` class.
@@ -243,7 +247,7 @@ class FilesMixin(object):
         else:
             bucket = records_buckets.bucket
 
-        return FilesIterator(self, bucket=bucket)
+        return self.files_iter_cls(self, bucket=bucket, file_cls=self.file_cls)
 
 
 class Record(_Record, FilesMixin):
