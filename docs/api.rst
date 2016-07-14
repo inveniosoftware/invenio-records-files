@@ -42,3 +42,9 @@ Models
 .. automodule:: invenio_records_files.models
    :members:
    :undoc-members:
+
+Links
+-----
+.. automodule:: invenio_records_files.links
+   :members:
+   :undoc-members:

@@ -30,4 +30,5 @@ Invenio modules that integrates records and files.
 - Jiri Kuncar <jiri.kuncar@cern.ch>
 - Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
 - Leonardo Rossi <leonardo.r@cern.ch>
+- Nikos Filippakis <nikolaos.filippakis@cern.ch>
 - Sami Hiltunen <sami.mikael.hiltunen@cern.ch>

@@ -38,6 +38,7 @@ from invenio_db import db as db_
 from invenio_db import InvenioDB
 from invenio_files_rest import InvenioFilesREST
 from invenio_files_rest.models import Bucket, Location
+from invenio_files_rest.views import blueprint as files_rest_blueprint
 from invenio_records import InvenioRecords
 from six import BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists
@@ -57,6 +58,7 @@ def app(request):
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
         TESTING=True,
     )
+    app_.register_blueprint(files_rest_blueprint)
     FlaskCLI(app_)
     InvenioDB(app_)
     InvenioRecords(app_)
