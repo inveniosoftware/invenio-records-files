@@ -31,7 +31,13 @@ from invenio_records.errors import MissingModelError
 
 
 def sorted_files_from_bucket(bucket, keys=None):
-    """Return files from bucket sorted by given keys."""
+    """Return files from bucket sorted by given keys.
+
+    :param bucket: :class:`~invenio_files_rest.models.Bucket` containing the
+        files.
+    :param keys: Keys order to be used.
+    :returns: Sorted list of bucket items.
+    """
     keys = keys or []
     total = len(keys)
     sortby = dict(zip(keys, range(total)))
@@ -40,7 +46,13 @@ def sorted_files_from_bucket(bucket, keys=None):
 
 
 def record_file_factory(pid, record, filename):
-    """Get file from a record."""
+    """Get file from a record.
+
+    :param pid: Not used. It keeps the function signature.
+    :param record: Record which contains the files.
+    :param filename: Name of the file to be returned.
+    :returns: File object or ``None`` if not found.
+    """
     try:
         if not (hasattr(record, 'files') and record.files):
             return None

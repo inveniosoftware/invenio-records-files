@@ -44,6 +44,7 @@ class RecordsBuckets(db.Model):
         nullable=False,
         # NOTE no unique constrain for better future ...
     )
+    """Record related with the bucket."""
 
     bucket_id = db.Column(
         UUIDType,
@@ -51,13 +52,23 @@ class RecordsBuckets(db.Model):
         primary_key=True,
         nullable=False,
     )
+    """Bucket related with the record."""
 
     bucket = db.relationship(Bucket)
+    """Relationship to the bucket."""
+
     record = db.relationship(RecordMetadata)
+    """It is used by SQLAlchemy for optimistic concurrency control."""
 
     @classmethod
     def create(cls, record, bucket):
-        """Create a new RecordsBuckets and adds it to the session."""
+        """Create a new RecordsBuckets and adds it to the session.
+
+        :param record: Record used to relate with the ``Bucket``.
+        :param bucket: Bucket used to relate with the ``Record``.
+        :returns: The :class:`~invenio_records_files.models.RecordsBuckets`
+            object created.
+        """
         rb = cls(record=record, bucket=bucket)
         db.session.add(rb)
         return rb

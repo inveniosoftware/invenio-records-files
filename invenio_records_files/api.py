@@ -46,12 +46,21 @@ class FileObject(object):
         self.data = data
 
     def get_version(self, version_id=None):
-        """Return specific version ``ObjectVersion`` instance or HEAD."""
+        """Return specific version ``ObjectVersion`` instance or HEAD.
+
+        :param version_id: Version ID of the object.
+        :returns: :class:`~invenio_files_rest.models.ObjectVersion` instance or
+            HEAD of the stored object.
+        """
         return ObjectVersion.get(bucket=self.obj.bucket, key=self.obj.key,
                                  version_id=version_id)
 
     def get(self, key, default=None):
-        """Proxy to ``obj``."""
+        """Proxy to ``obj``.
+
+        :param key: Metadata key which holds the value.
+        :returns: Metadata value of the specified key or default.
+        """
         if hasattr(self.obj, key):
             return getattr(self.obj, key)
         return self.data.get(key, default)
@@ -73,7 +82,7 @@ class FileObject(object):
         self.data[key] = value
 
     def dumps(self):
-        """Create a dump."""
+        """Create a dump of the metadata associated to the record."""
         self.data.update({
             'bucket': str(self.obj.bucket_id),
             'checksum': self.obj.file.checksum,
@@ -85,10 +94,20 @@ class FileObject(object):
 
 
 def _writable(method):
-    """Check that record is in defined status."""
+    """Check that record is in defined status.
+
+    :param method: Method to be decorated.
+    :returns: Function decorated.
+    """
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        """Send record for indexing."""
+        """Send record for indexing.
+
+        :returns: Execution result of the decorated method.
+
+        :raises InvalidOperationError: It occurs when the bucket is locked or
+            deleted.
+        """
         if self.bucket.locked or self.bucket.deleted:
             raise InvalidOperationError()
         return method(self, *args, **kwargs)
@@ -175,7 +194,10 @@ class FilesIterator(object):
             self.flush()
 
     def sort_by(self, *ids):
-        """Update files order."""
+        """Update files order.
+
+        :param ids: List of ids specifying the final status of the list.
+        """
         # Support sorting by file_ids or keys.
         files = {str(f_.file_id): f_.key for f_ in self}
         # self.record['_files'] = [{'key': files.get(id_, id_)} for id_ in ids]
@@ -187,7 +209,12 @@ class FilesIterator(object):
 
     @_writable
     def rename(self, old_key, new_key):
-        """Rename a file."""
+        """Rename a file.
+
+        :param old_key: Old key that holds the object.
+        :param new_key: New key that will hold the object.
+        :returns: The object that has been renamed.
+        """
         assert new_key not in self
         assert old_key != new_key
 
@@ -207,7 +234,13 @@ class FilesIterator(object):
         return obj
 
     def dumps(self, bucket=None):
-        """Serialize files from a bucket."""
+        """Serialize files from a bucket.
+
+        :param bucket: Instance of files
+            :class:`invenio_files_rest.models.Bucket`. (Default:
+            ``self.bucket``)
+        :returns: List of serialized files.
+        """
         return [
             self.file_cls(o, self.filesmap.get(o.key, {})).dumps()
             for o in sorted_files_from_bucket(bucket or self.bucket, self.keys)
@@ -224,18 +257,30 @@ class FilesMixin(object):
     """
 
     file_cls = FileObject
+    """File class used to generate the instance of files. Default to
+    :class:`~invenio_records_files.api.FileObject`
+    """
+
     files_iter_cls = FilesIterator
+    """Files iterator class used to generate the files iterator. Default to
+    :class:`~invenio_records_files.api.FilesIterator`
+    """
 
     def _create_bucket(self):
         """Return an instance of ``Bucket`` class.
 
         .. note:: Reimplement in children class for custom behavior.
+
+        :returns: Instance of :class:`invenio_files_rest.models.Bucket`.
         """
         return None
 
     @property
     def files(self):
-        """Get files iterator."""
+        """Get files iterator.
+
+        :returns: Files iterator.
+        """
         if self.model is None:
             raise MissingModelError()
 
@@ -257,7 +302,12 @@ class Record(_Record, FilesMixin):
     """Define API for files manipulation using ``FilesMixin``."""
 
     def delete(self, force=False):
-        """Delete a record and also remove the RecordsBuckets if necessary."""
+        """Delete a record and also remove the RecordsBuckets if necessary.
+
+        :param force: True to remove also the
+            :class:`~invenio_records_files.models.RecordsBuckets` object.
+        :returns: Deleted record.
+        """
         if force:
             RecordsBuckets.query.filter_by(
                 record=self.model,
