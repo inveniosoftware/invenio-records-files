@@ -64,6 +64,8 @@ def test_files_property(app, db, location, bucket):
 
     assert 0 == len(record.files)
     assert 'invalid' not in record.files
+    # make sure that _files key is not added after accessing record.files
+    assert '_files' not in record
 
     with pytest.raises(KeyError):
         record.files['invalid']

@@ -105,9 +105,8 @@ class FilesIterator(object):
         self.model = record.model
         self.file_cls = file_cls or FileObject
         self.bucket = bucket
-        self.record.setdefault('_files', [])
         self.filesmap = OrderedDict([
-            (f['key'], f) for f in self.record['_files']
+            (f['key'], f) for f in self.record.get('_files', [])
         ])
 
     @property
@@ -147,7 +146,11 @@ class FilesIterator(object):
 
     def flush(self):
         """Flush changes to record."""
-        self.record['_files'] = self.dumps()
+        files = self.dumps()
+        # Do not create `_files` when there has not been `_files` field before
+        # and the record still has no files attached.
+        if files or '_files' in self.record:
+            self.record['_files'] = files
 
     @_writable
     def __setitem__(self, key, stream):
