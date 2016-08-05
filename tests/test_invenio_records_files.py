@@ -198,6 +198,20 @@ def test_filesmixin(app, db, location, record):
     assert record.files is None
 
 
+def test_filesdescriptor(app, db, location, bucket,
+                         record_with_bucket):
+    """Test direct modification files property."""
+    record = record_with_bucket
+
+    record.files = {'hello.txt': BytesIO(b'Hello world!')}
+
+    assert len(record.files) == 1
+    assert len(record['_files']) == 1
+
+    with pytest.raises(RuntimeError):
+        record.files = {'world.txt': BytesIO(b'Hello world!')}
+
+
 def test_bucket_modification(app, db, location, bucket,
                              record_with_bucket):
     """Test direct modification of bucket."""

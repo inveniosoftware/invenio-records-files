@@ -297,6 +297,15 @@ class FilesMixin(object):
 
         return self.files_iter_cls(self, bucket=bucket, file_cls=self.file_cls)
 
+    @files.setter
+    def files(self, data):
+        """Set files from data."""
+        current_files = self.files
+        if current_files:
+            raise RuntimeError('Can not update existing files.')
+        for key in data:
+            current_files[key] = data[key]
+
 
 class Record(_Record, FilesMixin):
     """Define API for files manipulation using ``FilesMixin``."""
