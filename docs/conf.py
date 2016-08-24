@@ -137,8 +137,8 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'invenio-records-files@GitHub': 'http://github.com/inveniosoftware/invenio-records-files',
-        'invenio-records-files@PyPI': 'http://pypi.python.org/pypi/invenio-records-files/',
+        'invenio-records-files@GitHub': 'https://github.com/inveniosoftware/invenio-records-files',
+        'invenio-records-files@PyPI': 'https://pypi.python.org/pypi/invenio-records-files/',
     }
 }
 
@@ -331,7 +331,13 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'https://docs.python.org/': None,
+    'invenio-records': (
+        'https://pythonhosted.org/invenio-records', None
+    ),
     'invenio-files-rest': (
         'https://pythonhosted.org/invenio-files-rest', None
     ),
 }
+
+# Autodoc configuraton.
+autoclass_content = 'both'
