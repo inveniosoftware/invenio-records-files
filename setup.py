@@ -61,7 +61,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'invenio-db[versioning]>=1.0.0a9',
+    'Flask>=0.11.1',
+    'invenio-db[versioning]>=1.0.0b1',
     'invenio-records>=1.0.0a15',
     'invenio-files-rest>=1.0.0a1',
 ]
