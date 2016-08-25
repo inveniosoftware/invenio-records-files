@@ -32,3 +32,4 @@ Invenio modules that integrates records and files.
 - Leonardo Rossi <leonardo.r@cern.ch>
 - Nikos Filippakis <nikolaos.filippakis@cern.ch>
 - Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
+- Alizee Pace <alizee.pace@gmail.com>
