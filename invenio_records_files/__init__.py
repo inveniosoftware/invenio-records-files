@@ -29,14 +29,11 @@ Invenio-Files-REST.
 
 Initialization
 --------------
-First create a Flask application (Flask-CLI is not needed for Flask
-version 1.0+):
+First create a Flask application:
 
 >>> from flask import Flask
->>> from flask_cli import FlaskCLI
 >>> app = Flask('myapp')
 >>> app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
->>> ext_cli = FlaskCLI(app)
 
 Records-Files have no Flask extension, however it is dependent on
 Invenio-Records and Invenio-Files-REST which must be initialized first:

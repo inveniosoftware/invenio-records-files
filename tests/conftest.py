@@ -33,7 +33,6 @@ import tempfile
 
 import pytest
 from flask import Flask
-from flask_cli import FlaskCLI
 from invenio_db import db as db_
 from invenio_db import InvenioDB
 from invenio_files_rest import InvenioFilesREST
@@ -59,7 +58,6 @@ def app(request):
         TESTING=True,
     )
     app_.register_blueprint(files_rest_blueprint)
-    FlaskCLI(app_)
     InvenioDB(app_)
     InvenioRecords(app_)
     InvenioFilesREST(app_)
