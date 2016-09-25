@@ -46,4 +46,4 @@ Invenio modules that integrates records and files.
 *This is an experimental developer preview release.*
 
 * Free software: GPLv2 license
-* Documentation: https://pythonhosted.org/invenio-records-files/
+* Documentation: https://invenio-records-files.readthedocs.io/

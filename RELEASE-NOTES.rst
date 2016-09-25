@@ -24,7 +24,7 @@ Installation
 Documentation
 -------------
 
-   http://pythonhosted.org/invenio-records-files/
+   http://invenio-records-files.readthedocs.io/
 
 Happy hacking and thanks for flying Invenio-Records-Files.
 
