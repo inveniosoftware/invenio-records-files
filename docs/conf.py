@@ -332,10 +332,10 @@ texinfo_documents = [
 intersphinx_mapping = {
     'https://docs.python.org/': None,
     'invenio-records': (
-        'https://pythonhosted.org/invenio-records', None
+        'https://invenio-records.readthedocs.io/en/latest/', None
     ),
     'invenio-files-rest': (
-        'https://pythonhosted.org/invenio-files-rest', None
+        'https://invenio-files-rest.readthedocs.io/en/latest/', None
     ),
 }
 
