@@ -97,6 +97,9 @@ setup(
         'invenio_jsonschemas.schemas': [
             'records_files = invenio_records_files.jsonschemas',
         ],
+        'invenio_search.mappings': [
+            'records-files = invenio_records_files.mappings',
+        ],
     },
     extras_require=extras_require,
     install_requires=install_requires,

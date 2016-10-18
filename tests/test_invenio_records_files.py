@@ -270,3 +270,27 @@ def test_bucket_link_factory_has_bucket(app, db, location, bucket):
         assert default_bucket_link_factory(pid) == url_for(
             'invenio_files_rest.bucket_api', bucket_id=bucket.id,
             _external=True)
+
+
+def test_index_attachments(app, db, location, record_with_bucket):
+    """Test bucket creation and assignment."""
+    record = record_with_bucket
+    files = {
+        u'1.txt': (False, False),
+        u'2.txt': ({}, False),
+        u'3.txt': ({'_indexed_chars': -1}, True),
+    }
+    for key, (attachment, included) in files.items():
+        record.files[key] = BytesIO(key.encode('utf-8'))
+        record.files[key]['_attachment'] = attachment
+
+    record.files.flush()
+
+    from invenio_records_files.receivers import index_attachments
+    data = record.dumps()
+    index_attachments(app, json=data, record=record, index=None, doc_type=None)
+
+    for file_ in data['_files']:
+        should_have_attachment = files[file_['key']][1]
+        has_attachment = '_attachment' in file_
+        assert has_attachment == should_have_attachment, file_['key']

@@ -1,0 +1,60 @@
+{
+  "mappings": {
+    "records-files-v1.0.0": {
+      "properties": {
+        "_files": {
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "checksum": {
+              "type": "string"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "version_id": {
+              "type": "string"
+            },
+            "_attachment": {
+              "type": "attachment",
+              "fields": {
+                "content": {
+                  "term_vector": "with_positions_offsets",
+                  "store": "yes"
+                },
+                "author": {
+                  "store": "yes"
+                },
+                "title": {
+                  "store": "yes"
+                },
+                "name": {
+                  "store": "yes"
+                },
+                "date": {
+                  "store": "yes"
+                },
+                "keywords": {
+                  "store": "yes"
+                },
+                "content_type": {
+                  "store": "yes"
+                },
+                "content_length": {
+                  "store": "yes"
+                },
+                "language": {
+                  "store": "yes"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
