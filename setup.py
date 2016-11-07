@@ -91,6 +91,9 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
+        'invenio_db.alembic': [
+            'invenio_records_files = invenio_records_files:alembic',
+        ],
         'invenio_db.models': [
             'invenio_records_files = invenio_records_files.models',
         ],

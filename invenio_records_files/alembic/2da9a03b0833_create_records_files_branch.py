@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
 # Copyright (C) 2016 CERN.
@@ -22,22 +21,22 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+"""Create records_files branch."""
 
-include *.rst
-include *.sh
-include *.txt
-include .dockerignore
-include .editorconfig
-include docs/requirements.txt
-include .lgtm
-include LICENSE
-include MAINTAINERS
-include pytest.ini
-recursive-include docs *.bat
-recursive-include docs *.py
-recursive-include docs *.rst
-recursive-include docs Makefile
-recursive-include examples *.py
-recursive-include invenio_records_files *.json
-recursive-include invenio_records_files *.py
-recursive-include tests *.py
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision = '2da9a03b0833'
+down_revision = 'dbdbc1b19cf2'
+branch_labels = (u'invenio_records_files',)
+depends_on = 'dbdbc1b19cf2'
+
+
+def upgrade():
+    """Upgrade database."""
+
+
+def downgrade():
+    """Downgrade database."""

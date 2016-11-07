@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
 # Copyright (C) 2016 CERN.
@@ -22,22 +21,38 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+"""Create records files tables."""
 
-include *.rst
-include *.sh
-include *.txt
-include .dockerignore
-include .editorconfig
-include docs/requirements.txt
-include .lgtm
-include LICENSE
-include MAINTAINERS
-include pytest.ini
-recursive-include docs *.bat
-recursive-include docs *.py
-recursive-include docs *.rst
-recursive-include docs Makefile
-recursive-include examples *.py
-recursive-include invenio_records_files *.json
-recursive-include invenio_records_files *.py
-recursive-include tests *.py
+import sqlalchemy as sa
+import sqlalchemy_utils
+from alembic import op
+
+
+# revision identifiers, used by Alembic.
+revision = '1ba76da94103'
+down_revision = '2da9a03b0833'
+branch_labels = ()
+depends_on = None
+
+
+def upgrade():
+    """Upgrade database."""
+    op.create_table(
+        'records_buckets',
+        sa.Column(
+            'record_id',
+            sqlalchemy_utils.types.uuid.UUIDType(),
+            nullable=False),
+        sa.Column(
+            'bucket_id',
+            sqlalchemy_utils.types.uuid.UUIDType(),
+            nullable=False),
+        sa.ForeignKeyConstraint(['bucket_id'], [u'files_bucket.id'], ),
+        sa.ForeignKeyConstraint(['record_id'], [u'records_metadata.id'], ),
+        sa.PrimaryKeyConstraint('record_id', 'bucket_id')
+    )
+
+
+def downgrade():
+    """Downgrade database."""
+    op.drop_table('records_buckets')
