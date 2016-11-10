@@ -51,6 +51,9 @@ def app(request):
     instance_path = tempfile.mkdtemp()
     app_ = Flask(__name__, instance_path=instance_path)
     app_.config.update(
+        FILES_REST_PERMISSION_FACTORY=lambda *a, **kw: type(
+            'Allow', (object, ), {'can': lambda self: True}
+        )(),
         SECRET_KEY='CHANGE_ME',
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite://'),
@@ -125,5 +128,7 @@ def generic_file(app, record):
     stream = BytesIO(b'test example')
     filename = 'generic_file.txt'
     record.files[filename] = stream
+    record.files.dumps()
+    record.commit()
     db_.session.commit()
     return filename

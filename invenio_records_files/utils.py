@@ -26,7 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import abort
 from invenio_files_rest.models import ObjectVersion
+from invenio_files_rest.views import ObjectResource
 from invenio_records.errors import MissingModelError
 
 
@@ -63,3 +65,49 @@ def record_file_factory(pid, record, filename):
         return record.files[filename]
     except KeyError:
         return None
+
+
+def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
+    """File download view for a given record.
+
+    Plug this method into your ``RECORDS_UI_ENDPOINTS`` configuration:
+
+    .. code-block:: python
+
+        RECORDS_UI_ENDPOINTS = dict(
+            recid=dict(
+                # ...
+                route='/records/<pid_value/files/<filename>',
+                view_imp='invenio_records_files.utils:file_download_ui',
+                record_class='invenio_records_files.api:Record',
+            )
+        )
+
+    :param pid: The :class:`invenio_pidstore.models.PersistentIdentifier`
+        instance.
+    :param record: The record metadata.
+    """
+    _record_file_factory = _record_file_factory or record_file_factory
+    # Extract file from record.
+    fileobj = _record_file_factory(
+        pid, record, kwargs.get('filename')
+    )
+
+    if not fileobj:
+        abort(404)
+
+    obj = fileobj.obj
+
+    # Check permissions
+    ObjectResource.check_object_permission(obj)
+
+    # Send file.
+    return ObjectResource.send_object(
+        obj.bucket, obj,
+        expected_chksum=fileobj.get('checksum'),
+        logger_data={
+            'bucket_id': obj.bucket_id,
+            'pid_type': pid.pid_type,
+            'pid_value': pid.pid_value,
+        },
+    )
