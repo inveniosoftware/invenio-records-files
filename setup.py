@@ -49,11 +49,22 @@ extras_require = {
     'docs': [
         'Sphinx>=1.4.2',
     ],
+    'mysql': [
+        'invenio-db[mysql,versioning]>=1.0.0b3',
+    ],
+    'postgresql': [
+        'invenio-db[postgresql,versioning]>=1.0.0b3',
+    ],
+    'sqlite': [
+        'invenio-db[versioning]>=1.0.0b3',
+    ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
-for reqs in extras_require.values():
+for name, reqs in extras_require.items():
+    if name in ('mysql', 'postgresql', 'sqlite'):
+        continue
     extras_require['all'].extend(reqs)
 
 setup_requires = [
@@ -62,7 +73,6 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'invenio-db[versioning]>=1.0.0b3',
     'invenio-files-rest>=1.0.0a14',
     'invenio-records>=1.0.0b1',
 ]
