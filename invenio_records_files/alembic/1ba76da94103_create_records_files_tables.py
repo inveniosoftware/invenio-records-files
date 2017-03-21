@@ -32,7 +32,10 @@ from alembic import op
 revision = '1ba76da94103'
 down_revision = '2da9a03b0833'
 branch_labels = ()
-depends_on = None
+depends_on = (
+    '2e97565eba72',  # invenio-files-rest
+    '862037093962',  # invenio-records
+)
 
 
 def upgrade():

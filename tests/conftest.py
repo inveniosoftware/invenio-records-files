@@ -40,7 +40,8 @@ from invenio_files_rest.models import Bucket, Location
 from invenio_files_rest.views import blueprint as files_rest_blueprint
 from invenio_records import InvenioRecords
 from six import BytesIO
-from sqlalchemy_utils.functions import create_database, database_exists
+from sqlalchemy_utils.functions import create_database, database_exists, \
+    drop_database
 
 from invenio_records_files.api import Record, RecordsBuckets
 
@@ -79,7 +80,7 @@ def db(app):
     db_.create_all()
     yield db_
     db_.session.remove()
-    db_.drop_all()
+    drop_database(str(db_.engine.url))
 
 
 @pytest.fixture()

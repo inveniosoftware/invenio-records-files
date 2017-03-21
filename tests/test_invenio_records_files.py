@@ -308,3 +308,22 @@ def test_index_attachments(app, db, location, record_with_bucket):
         should_have_attachment = files[file_['key']][1]
         has_attachment = '_attachment' in file_
         assert has_attachment == should_have_attachment, file_['key']
+
+
+def test_alembic(app, db):
+    """Test alembic recipes."""
+    ext = app.extensions['invenio-db']
+
+    if db.engine.name == 'sqlite':
+        raise pytest.skip('Upgrades are not supported on SQLite.')
+
+    assert not ext.alembic.compare_metadata()
+    db.drop_all()
+    ext.alembic.upgrade()
+
+    assert not ext.alembic.compare_metadata()
+    ext.alembic.stamp()
+    ext.alembic.downgrade(target='96e796392533')
+    ext.alembic.upgrade()
+
+    assert not ext.alembic.compare_metadata()
