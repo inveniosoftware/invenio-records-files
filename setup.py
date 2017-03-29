@@ -47,7 +47,7 @@ tests_require = [
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.4.2',
+        'Sphinx>=1.5.1',
     ],
     'mysql': [
         'invenio-db[mysql,versioning]>=1.0.0b3',
