@@ -1,8 +1,8 @@
 ================================
- Invenio-Records-Files v1.0.0a8
+ Invenio-Records-Files v1.0.0a9
 ================================
 
-Invenio-Records-Files v1.0.0a8 was released on November 15, 2016.
+Invenio-Records-Files v1.0.0a9 was released on May 16, 2017.
 
 About
 -----
@@ -19,7 +19,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-records-files==1.0.0a8
+   $ pip install invenio-records-files==1.0.0a9
 
 Documentation
 -------------
