@@ -154,7 +154,7 @@ class FilesIterator(object):
     def __contains__(self, key):
         """Test if file exists."""
         return ObjectVersion.get_by_bucket(
-            self.bucket).filter_by(key=str(key)).count()
+            self.bucket).filter_by(key=key).count()
 
     def __getitem__(self, key):
         """Get a specific file."""

@@ -128,6 +128,14 @@ def test_files_property(app, db, location, bucket):
     assert 'hello.txt' in record.files
 
 
+def test_files_unicode(app, db, location, record_with_bucket):
+    record = record_with_bucket
+
+    # Create a file with a unicode filename.
+    record.files[u'hellö.txt'] = BytesIO(b'Hello world!')
+    assert u'hellö.txt' in record.files
+
+
 def test_files_extra_data(app, db, location, record_with_bucket):
     """Test record files property."""
     record = record_with_bucket
