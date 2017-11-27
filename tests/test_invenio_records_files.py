@@ -49,7 +49,7 @@ def test_version():
 
 
 def test_jsonschemas_import():
-    """Test jsonschemas import"""
+    """Test jsonschemas import."""
     from invenio_records_files import jsonschemas
 
 

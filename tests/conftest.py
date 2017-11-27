@@ -38,7 +38,9 @@ from invenio_db import InvenioDB
 from invenio_files_rest import InvenioFilesREST
 from invenio_files_rest.models import Bucket, Location
 from invenio_files_rest.views import blueprint as files_rest_blueprint
+from invenio_indexer import InvenioIndexer
 from invenio_records import InvenioRecords
+from invenio_search import InvenioSearch
 from six import BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
@@ -65,6 +67,9 @@ def app(request):
     InvenioDB(app_)
     InvenioRecords(app_)
     InvenioFilesREST(app_)
+    InvenioIndexer(app_)
+    search = InvenioSearch(app_)
+    search.register_mappings('records-files', 'data')
 
     with app_.app_context():
         yield app_
