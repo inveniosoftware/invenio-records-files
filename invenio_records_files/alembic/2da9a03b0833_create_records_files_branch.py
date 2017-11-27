@@ -23,9 +23,8 @@
 
 """Create records_files branch."""
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '2da9a03b0833'

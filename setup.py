@@ -43,6 +43,8 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
+    'invenio-indexer>=1.0.0a10',
+    'invenio-search>=1.0.0b1',
 ]
 
 extras_require = {
@@ -109,10 +111,7 @@ setup(
         ],
         'invenio_jsonschemas.schemas': [
             'records_files = invenio_records_files.jsonschemas',
-        ],
-        'invenio_search.mappings': [
-            'records-files = invenio_records_files.mappings',
-        ],
+        ]
     },
     extras_require=extras_require,
     install_requires=install_requires,
