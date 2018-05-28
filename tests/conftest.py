@@ -33,8 +33,8 @@ import tempfile
 
 import pytest
 from flask import Flask
-from invenio_db import db as db_
 from invenio_db import InvenioDB
+from invenio_db import db as db_
 from invenio_files_rest import InvenioFilesREST
 from invenio_files_rest.models import Bucket, Location
 from invenio_files_rest.views import blueprint as files_rest_blueprint
