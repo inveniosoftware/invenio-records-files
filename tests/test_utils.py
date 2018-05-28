@@ -43,8 +43,21 @@ def test_file_download_ui(app, db, location, record_with_bucket, generic_file):
         assert response.status_code == 200
         assert response.mimetype == 'text/plain'
 
+        response = file_download_ui(
+            pid, record_with_bucket, filename=generic_file
+        )
+
         with pytest.raises(NotFound):
             file_download_ui(pid, record_with_bucket)
 
         with pytest.raises(NotFound):
             file_download_ui(pid, record_with_bucket, filename='not_found')
+
+    with app.test_request_context('/?download'):
+        response = file_download_ui(
+            pid, record_with_bucket, filename=generic_file
+        )
+        assert response.status_code == 200
+        assert response.mimetype == 'text/plain'
+        assert response.headers['Content-Disposition'] == \
+            'attachment; filename={}'.format(generic_file)

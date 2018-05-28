@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import abort
+from flask import abort, request
 from invenio_files_rest.models import ObjectVersion
 from invenio_files_rest.views import ObjectResource
 from invenio_records.errors import MissingModelError
@@ -83,6 +83,9 @@ def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
             )
         )
 
+    If ``download`` is passed as a querystring argument, the file is sent as an
+    attachment.
+
     :param pid: The :class:`invenio_pidstore.models.PersistentIdentifier`
         instance.
     :param record: The record metadata.
@@ -110,4 +113,5 @@ def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
             'pid_type': pid.pid_type,
             'pid_value': pid.pid_value,
         },
+        as_attachment=('download' in request.args)
     )
