@@ -25,10 +25,8 @@
 """Invenio modules that integrates records and files."""
 
 import os
-import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
 readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
@@ -75,7 +73,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'invenio-files-rest>=1.0.0a14',
+    'invenio-files-rest>=1.0.0a23',
     'invenio-records>=1.0.0b1',
 ]
 
