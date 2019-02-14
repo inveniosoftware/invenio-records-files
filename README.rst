@@ -19,6 +19,9 @@
 .. image:: https://img.shields.io/pypi/v/invenio-records-files.svg
         :target: https://pypi.org/pypi/invenio-records-files
 
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-records-files.svg
+        :target: https://github.com/inveniosoftware/invenio-records-files/blob/master/LICENSE
+
 
 Invenio modules that integrates records and files.
 
