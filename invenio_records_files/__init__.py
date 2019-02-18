@@ -116,7 +116,8 @@ Besides creating files we can also assign metadata to files:
 >>> print(record.files['hello.txt']['filetype'])
 txt
 
-Certain key names are however reserved cannot be used for **setting** metadata:
+Certain key names are however reserved and cannot be used for **setting**
+metadata:
 
 >>> fileobj['key'] = 'test'
 Traceback (most recent call last):
@@ -154,7 +155,7 @@ Extracting file from record
 ---------------------------
 Some Invenio modules, e.g. Invenio-Previewer need to extract a file from
 record and be resilient towards exactly which record class is being used. This
-can done using the a record file factory:
+can be done using the record file factory:
 
 >>> from invenio_records_files.utils import record_file_factory
 >>> fileobj = record_file_factory(None, record, 'hello.txt')
@@ -167,6 +168,25 @@ factory will return ``None``:
 >>> fileobj = record_file_factory(None, record, 'invalid')
 >>> fileobj is None
 True
+
+
+Integration with invenio-records-ui
+-----------------------------------
+If you are using ``invenio-records-ui``, you can easily add new views by
+defining new endpoints into your ``RECORDS_UI_ENDPOINTS`` configuration.
+In particular, you can add the ``file_download_ui`` endpoint:
+
+.. code-block:: python
+
+    RECORDS_UI_ENDPOINTS = dict(
+        recid=dict(
+            # ...
+            route='/records/<pid_value/files/<filename>',
+            view_imp='invenio_records_files.utils:file_download_ui',
+            record_class='invenio_records_files.api:Record',
+        )
+    )
+
 """
 
 from __future__ import absolute_import, print_function
