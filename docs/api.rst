@@ -22,10 +22,6 @@ Utilities
    :members:
    :undoc-members:
 
-.. automodule:: invenio_records_files.receivers
-   :members:
-   :undoc-members:
-
 Models
 ------
 .. automodule:: invenio_records_files.models
