@@ -10,6 +10,9 @@
  Invenio-Records-Files
 =======================
 
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-records-files.svg
+        :target: https://github.com/inveniosoftware/invenio-records-files/blob/master/LICENSE
+
 .. image:: https://img.shields.io/travis/inveniosoftware/invenio-records-files.svg
         :target: https://travis-ci.org/inveniosoftware/invenio-records-files
 
@@ -19,13 +22,18 @@
 .. image:: https://img.shields.io/pypi/v/invenio-records-files.svg
         :target: https://pypi.org/pypi/invenio-records-files
 
-.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-records-files.svg
-        :target: https://github.com/inveniosoftware/invenio-records-files/blob/master/LICENSE
+
+Invenio module that provides basic API for integrating `Invenio-Records <https://github.com/inveniosoftware/invenio-records>`_
+and `Invenio-Files-REST <https://github.com/inveniosoftware/invenio-files-rest>`_.
+
+Features:
+
+- Records creation
+- Files creation
+- Accessing files
+- Files metadata management
+- Files extraction from records
 
 
-Invenio modules that integrates records and files.
-
-*This is an experimental developer preview release.*
-
-* Free software: MIT license
-* Documentation: https://invenio-records-files.readthedocs.io/
+Further documentation is available on
+https://invenio-records-files.readthedocs.io/en/latest/usage.html#initializations
