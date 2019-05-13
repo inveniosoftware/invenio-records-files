@@ -5,19 +5,19 @@
         "_files": {
           "properties": {
             "key": {
-              "type": "string"
+              "type": "text"
             },
             "bucket": {
-              "type": "string"
+              "type": "text"
             },
             "checksum": {
-              "type": "string"
+              "type": "text"
             },
             "size": {
               "type": "integer"
             },
             "version_id": {
-              "type": "string"
+              "type": "text"
             },
             "_attachment": {
               "type": "attachment",

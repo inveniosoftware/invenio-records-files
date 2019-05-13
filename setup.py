@@ -25,7 +25,7 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=3.3.1',
     'invenio-indexer>=1.0.0',
-    'invenio-search[elasticsearch2]>=1.0.0',
+    'invenio-search[elasticsearch6]>=1.0.0',
 ]
 
 extras_require = {
