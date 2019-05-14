@@ -7,6 +7,9 @@
             "key": {
               "type": "text"
             },
+            "file_id": {
+              "type": "string"
+            },
             "bucket": {
               "type": "text"
             },
