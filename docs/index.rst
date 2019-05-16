@@ -19,6 +19,7 @@ Invenio-Records-Files.
    :maxdepth: 2
 
    installation
+   configuration
    usage
 
 

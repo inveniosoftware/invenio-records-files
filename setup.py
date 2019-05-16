@@ -18,14 +18,15 @@ history = open('CHANGES.rst').read()
 tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
+    'invenio-indexer>=1.0.0',
+    'invenio-records-rest>=1.4.2',
+    'invenio-search[elasticsearch6]>=1.0.0',
     'isort>=4.3.4',
     'mock>=1.3.0',
     'pydocstyle>=1.0.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=3.7.0',
-    'invenio-indexer>=1.0.0',
-    'invenio-search[elasticsearch6]>=1.0.0',
 ]
 
 extras_require = {
@@ -56,7 +57,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'invenio-files-rest>=1.0.0a23',
+    'invenio-files-rest>=1.0.0b1',
     'invenio-records>=1.0.0',
 ]
 
@@ -92,7 +93,11 @@ setup(
         ],
         'invenio_jsonschemas.schemas': [
             'records_files = invenio_records_files.jsonschemas',
-        ]
+        ],
+        'invenio_base.api_blueprints': [
+            'invenio_records_files = invenio_records_files.'
+            'views:create_blueprint_from_app',
+        ],
     },
     extras_require=extras_require,
     install_requires=install_requires,

@@ -12,7 +12,9 @@
 from __future__ import absolute_import, print_function
 
 import pytest
+from invenio_db import db
 from invenio_files_rest.models import Bucket, ObjectVersion
+from six import BytesIO
 from sqlalchemy.orm.exc import NoResultFound
 
 from invenio_records_files.api import Record
@@ -44,3 +46,10 @@ def test_cascade_action_record_delete(app, db, location, record_with_bucket,
     assert len(Bucket.query.all()) == 1
     assert len(Bucket.query.filter_by(id=bucket_id).all()) == 1
     assert ObjectVersion.get(bucket=bucket_id, key=generic_file)
+
+
+def test_creating_missing_bucket(
+        app, db, client, location, RecordWithBucketCreation):
+    record = RecordWithBucketCreation.create({'title': 'fuu'})
+    record.files = {'test.txt': BytesIO(b'Test file data')}
+    assert 'test.txt' in record.files

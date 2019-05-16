@@ -11,32 +11,82 @@
 
 from __future__ import absolute_import, print_function
 
+import imp
+import json
 import os
 import shutil
+import sys
 import tempfile
+import uuid
+from copy import deepcopy
 
 import pytest
 from flask import Flask
+from flask_login import LoginManager
 from invenio_db import InvenioDB
 from invenio_db import db as db_
 from invenio_files_rest import InvenioFilesREST
 from invenio_files_rest.models import Bucket, Location
 from invenio_files_rest.views import blueprint as files_rest_blueprint
 from invenio_indexer import InvenioIndexer
+from invenio_pidstore import InvenioPIDStore, current_pidstore
 from invenio_records import InvenioRecords
+from invenio_records_rest import InvenioRecordsREST
+from invenio_records_rest.config import RECORDS_REST_ENDPOINTS
+from invenio_records_rest.utils import PIDConverter, allow_all
+from invenio_records_rest.views import \
+    create_blueprint_from_app as records_rest_create_blueprint_from_app
 from invenio_search import InvenioSearch
 from six import BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
-from invenio_records_files.api import Record, RecordsBuckets
+from invenio_records_files import InvenioRecordsFiles
+from invenio_records_files.api import FilesMixin, Record, RecordsBuckets
+from invenio_records_files.views import create_blueprint_from_app
+
+
+@pytest.fixture
+def docid_record_type_endpoint():
+    """."""
+    docid = deepcopy(RECORDS_REST_ENDPOINTS['recid'])
+    docid['list_route'] = '/doc/'
+    docid['item_route'] = '/doc/<pid(recid):pid_value>'
+    return docid
+
+
+@pytest.fixture
+def basic_record_type_endpoint():
+    """."""
+    basic = deepcopy(RECORDS_REST_ENDPOINTS['recid'])
+    basic['list_route'] = '/basic/'
+    basic['item_route'] = '/basic/<pid(recid):pid_value>'
+    return basic
 
 
 @pytest.yield_fixture()
-def app(request):
+def app(request, docid_record_type_endpoint, RecordWithBucketCreation,
+        basic_record_type_endpoint, RecordWithoutFilesCreation):
     """Flask application fixture."""
     instance_path = tempfile.mkdtemp()
     app_ = Flask(__name__, instance_path=instance_path)
+    RECORDS_REST_ENDPOINTS.update(
+        docid=docid_record_type_endpoint,
+        basic=basic_record_type_endpoint
+    )
+    RECORDS_REST_ENDPOINTS['recid']['record_class'] = RecordWithBucketCreation
+    RECORDS_REST_ENDPOINTS['recid']['item_route'] = \
+        '/records/<pid(recid, ' \
+        'record_class="test_api.BucketAddingRecord"):pid_value>'
+    RECORDS_REST_ENDPOINTS['recid']['indexer_class'] = None
+
+    RECORDS_REST_ENDPOINTS['basic']['record_class'] = \
+        RecordWithoutFilesCreation
+    RECORDS_REST_ENDPOINTS['basic']['item_route'] = \
+        '/records/<pid(recid, ' \
+        'record_class="test_api_no_files.RecordWithoutFiles"):pid_value>'
+    RECORDS_REST_ENDPOINTS['basic']['indexer_class'] = None
+
     app_.config.update(
         FILES_REST_PERMISSION_FACTORY=lambda *a, **kw: type(
             'Allow', (object, ), {'can': lambda self: True}
@@ -46,12 +96,27 @@ def app(request):
             'SQLALCHEMY_DATABASE_URI', 'sqlite://'),
         SQLALCHEMY_TRACK_MODIFICATIONS=True,
         TESTING=True,
+        RECORDS_FILES_REST_ENDPOINTS={
+            'RECORDS_REST_ENDPOINTS': {
+                'recid': 'files',
+                'basic': 'nofiles',
+            }
+        },
+        RECORDS_REST_ENDPOINTS=RECORDS_REST_ENDPOINTS,
+        RECORDS_REST_DEFAULT_CREATE_PERMISSION_FACTORY=allow_all,
     )
-    app_.register_blueprint(files_rest_blueprint)
+
+    app_.url_map.converters['pid'] = PIDConverter
     InvenioDB(app_)
     InvenioRecords(app_)
     InvenioFilesREST(app_)
     InvenioIndexer(app_)
+    InvenioPIDStore(app_)
+    InvenioRecordsREST(app_)
+    InvenioRecordsFiles(app_)
+    app_.register_blueprint(files_rest_blueprint)
+    app_.register_blueprint(create_blueprint_from_app(app_))
+    app_.register_blueprint(records_rest_create_blueprint_from_app(app_))
     search = InvenioSearch(app_)
     search.register_mappings('records-files', 'data')
 
@@ -59,6 +124,13 @@ def app(request):
         yield app_
 
     shutil.rmtree(instance_path)
+
+
+@pytest.yield_fixture()
+def client(app):
+    """Get test client."""
+    with app.test_client() as client:
+        yield client
 
 
 @pytest.yield_fixture()
@@ -97,6 +169,19 @@ def record(app, db):
 
 
 @pytest.fixture()
+def minted_record(app, db):
+    """Create a test record."""
+    data = {
+        'title': 'fuu'
+    }
+    with db.session.begin_nested():
+        rec_uuid = uuid.uuid4()
+        pid = current_pidstore.minters['recid'](rec_uuid, data)
+        record = Record.create(data, id_=rec_uuid)
+    return pid, record
+
+
+@pytest.fixture()
 def bucket(location, db):
     """Create a bucket."""
     b = Bucket.create()
@@ -113,6 +198,15 @@ def record_with_bucket(record, bucket, db):
 
 
 @pytest.fixture()
+def minted_record_with_bucket(minted_record, bucket, db):
+    """Create a bucket."""
+    pid, record = minted_record
+    RecordsBuckets.create(bucket=bucket, record=record.model)
+    db.session.commit()
+    return pid, record
+
+
+@pytest.fixture()
 def generic_file(app, record):
     """Add a generic file to the record."""
     stream = BytesIO(b'test example')
@@ -122,3 +216,55 @@ def generic_file(app, record):
     record.commit()
     db_.session.commit()
     return filename
+
+
+@pytest.fixture()
+def RecordWithBucketCreation():
+    """Add _create_bucket implementation to record class"""
+    class BucketAddingFilesMixin(FilesMixin):
+        """Called when the record is not associated with a bucket."""
+        def _create_bucket(self):
+            from invenio_db import db
+            b = Bucket.create()
+            db.session.commit()
+            return b
+
+    class BucketAddingRecord(Record, BucketAddingFilesMixin):
+        pass
+
+    module_name = 'test_api'
+    test_api_module = imp.new_module(module_name)
+    test_api_module.BucketAddingRecord = BucketAddingRecord
+    sys.modules[module_name] = test_api_module
+    return BucketAddingRecord
+
+
+@pytest.fixture()
+def remove_create_bucket(RecordWithBucketCreation):
+    """Remove previously added implementation for _create_bucket"""
+    RecordWithBucketCreation._create_bucket = lambda *args: None
+
+
+@pytest.fixture()
+def record_created_through_rest(app, db, client):
+    HEADERS = [
+        ('Accept', 'application/json'),
+        ('Content-Type', 'application/json')
+    ]
+    # Create record
+    res = client.post(
+        '/records/', data=json.dumps({'title': 'foo'}), headers=HEADERS)
+
+    return json.loads(res.get_data(as_text=True))
+
+
+@pytest.fixture()
+def RecordWithoutFilesCreation():
+    """Add _create_bucket implementation to record class"""
+    from invenio_records.api import Record as RecordWithoutFiles
+
+    module_name = 'test_api_no_files'
+    test_api_module = imp.new_module(module_name)
+    test_api_module.RecordWithoutFiles = RecordWithoutFiles
+    sys.modules[module_name] = test_api_module
+    return RecordWithoutFiles

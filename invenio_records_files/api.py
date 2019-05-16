@@ -254,11 +254,21 @@ class FilesMixin(object):
     def _create_bucket(self):
         """Return an instance of ``Bucket`` class.
 
-        .. note:: Reimplement in children class for custom behavior.
+        .. note:: Override for custom behavior.
 
         :returns: Instance of :class:`invenio_files_rest.models.Bucket`.
         """
         return None
+
+    def resolve_files_to_bucket_id(self, files):
+        """Get bucket ID from record.
+
+        .. note:: Override for custom behavior.
+
+        :returns: UUID of record's bucket.
+        """
+        # Passing the record's files, not to query for it again.
+        return files.bucket.id
 
     @property
     def files(self):
