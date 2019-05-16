@@ -8,8 +8,9 @@
 
 """Integration of records and files for Invenio.
 
-Invenio-Records-Files provides basic API for integrating Invenio-Records and
-Invenio-Files-REST.
+Invenio-Records-Files provides basic API for integrating
+`Invenio-Records <https://invenio-records.rtfd.io/>`_
+and `Invenio-Files-REST <https://invenio-files-rest.rtfd.io/>`_.
 
 Initialization
 --------------
@@ -19,8 +20,10 @@ First create a Flask application:
 >>> app = Flask('myapp')
 >>> app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 
-Records-Files have no Flask extension, however it is dependent on
-Invenio-Records and Invenio-Files-REST which must be initialized first:
+Records-Files has no Flask extension, however it is dependent on
+`Invenio-Records <https://invenio-records.rtfd.io/>`_ and
+`Invenio-Files-REST <https://invenio-files-rest.rtfd.io/>`_ which must be
+initialized first:
 
 >>> from invenio_db import InvenioDB
 >>> ext_db = InvenioDB(app)
@@ -53,19 +56,19 @@ will create a location in a temporary directory:
 Creating a record
 -----------------
 You use Invenio-Records-Files basic API by importing
-``invenio_records_files.api.Record`` instead of
-``invenio_records.api.Record``:
+:py:class:`invenio_records_files.api.Record` instead of
+:py:class:`invenio_records.api.Record`:
 
 >>> from invenio_records_files.api import Record
 
-This records class has special property ``files`` through which you can access
-and create files. By default this property is ``None``:
+This ``Record`` class has a special property ``files`` through which you can
+access and create files. By default this property is ``None``:
 
 >>> record = Record.create({})
 >>> record.files is None
 True
 
-This is because no bucket have been assigned to the record yet.
+This is because no bucket has been assigned to the record yet.
 
 Assigning a bucket
 ~~~~~~~~~~~~~~~~~~
@@ -78,7 +81,8 @@ You assign a bucket to a record through
 >>> record_buckets = RecordsBuckets.create(record=record.model, bucket=bucket)
 
 Normally the bucket creation and bucket to record assignment is done by an
-external module (e.g. Invenio-Deposit is one example of this).
+external module (e.g. `Invenio-Deposit <https://invenio-deposit.rtfd.io>`_ is
+one example of this).
 
 The ``files`` property now has a value and we can e.g. ask for the number of
 files:
@@ -93,7 +97,7 @@ We are now ready to create our first file using the Invenio-Records-Files API:
 >>> from six import BytesIO
 >>> record.files['hello.txt'] = BytesIO(b'Hello, World')
 
-In above example we create a file named ``hello.txt`` and assigns a *stream*
+In above example we create a file named ``hello.txt`` and assign a *stream*
 like object which will be saved as a new object in the bucket.
 
 Accessing files
@@ -125,7 +129,7 @@ Traceback (most recent call last):
 KeyError: 'key'
 
 The reserved key names are all the properties which exists on
-``invenio_files_rest.models:ObjectVersion``.
+:py:class:`invenio_files_rest.models.ObjectVersion`.
 
 You can however still use the reserved keys for **getting** metadata:
 
@@ -153,9 +157,10 @@ hello.txt
 
 Extracting file from record
 ---------------------------
-Some Invenio modules, e.g. Invenio-Previewer need to extract a file from
-record and be resilient towards exactly which record class is being used. This
-can be done using the record file factory:
+Some Invenio modules, e.g.
+`Invenio-Previewer <https://invenio-previewer.rtfd.io/>`_ need to extract a
+file from the record and be resilient towards exactly which record class is
+being  used. This can be done using the record file factory:
 
 >>> from invenio_records_files.utils import record_file_factory
 >>> fileobj = record_file_factory(None, record, 'hello.txt')
@@ -170,11 +175,12 @@ factory will return ``None``:
 True
 
 
-Integration with invenio-records-ui
+Integration with Invenio-Records-UI
 -----------------------------------
-If you are using ``invenio-records-ui``, you can easily add new views by
-defining new endpoints into your ``RECORDS_UI_ENDPOINTS`` configuration.
-In particular, you can add the ``file_download_ui`` endpoint:
+If you are using `Invenio-Records-UI <https://invenio-records-ui.RTFD.io/>`_,
+you can easily add new views by defining new endpoints into your
+``RECORDS_UI_ENDPOINTS`` configuration. In particular, you can add the
+``file_download_ui`` endpoint:
 
 .. code-block:: python
 

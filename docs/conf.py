@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Invenio-Records-Files'
-copyright = u'2016, CERN'
+copyright = u'2016-2019, CERN'
 author = u'CERN'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -318,10 +318,10 @@ intersphinx_mapping = {
     'invenio-pidstore': (
         'https://invenio-pidstore.readthedocs.io/en/latest/', None
     ),
-    'invenio-records': (
+    'invenio_records': (
         'https://invenio-records.readthedocs.io/en/latest/', None
     ),
-    'invenio-files-rest': (
+    'invenio_files_rest': (
         'https://invenio-files-rest.readthedocs.io/en/latest/', None
     ),
 }
