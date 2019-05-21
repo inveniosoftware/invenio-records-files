@@ -145,6 +145,7 @@ You can make a dictionary of all files
 ...     print(k)
 bucket
 checksum
+file_id
 filetype
 key
 size

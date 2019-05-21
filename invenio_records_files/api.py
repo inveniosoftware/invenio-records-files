@@ -73,6 +73,7 @@ class FileObject(object):
             'key': self.obj.key,  # IMPORTANT it must stay here!
             'size': self.obj.file.size,
             'version_id': str(self.obj.version_id),
+            'file_id': str(self.obj.file.id)
         })
         return self.data
 
