@@ -152,6 +152,18 @@ def test_files_extra_data(app, db, location, record_with_bucket):
         assert record.files['hello.txt'].get(k)
 
 
+def test_files_extra_data_in_dump(app, db, location, record_with_bucket):
+    """Test if all neccessary properties are included in dumps() method."""
+    record = record_with_bucket
+
+    # Create a file.
+    record.files['hello.txt'] = BytesIO(b'Hello world!')
+    record['_files'] = record.files.dumps()
+
+    for k in ['bucket', 'checksum', 'key', 'size', 'version_id', 'file_id']:
+        assert k in record['_files'][0]
+
+
 def test_files_protection(app, db, location, record_with_bucket):
     """Test record files property protection."""
     record = record_with_bucket
