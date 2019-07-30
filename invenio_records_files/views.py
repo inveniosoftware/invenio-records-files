@@ -19,7 +19,7 @@ from invenio_records_files.models import RecordsBuckets
 
 
 def create_blueprint_from_app(app):
-    """Create Invenio-Records-Files blueprint from a Flask application.
+    """Create blueprint from a Flask application.
 
     :params app: A Flask application.
     :returns: Configured blueprint.
@@ -58,19 +58,28 @@ def create_blueprint_from_app(app):
         not, this function will pre-process the URL so the PID is removed from
         the URL and resolved to bucket ID which is injected into Files-REST
         view calls:
-        /api/<record_type>/<pid_value>/files/<key> -> /files/<bucket>/<key>.
+
+        ``/api/<record_type>/<pid_value>/files/<key>`` ->
+        ``/files/<bucket>/<key>``.
         """
-        # We are removing the value since we need the request values to include
-        # only the ones contained in the view signature.
+        # Remove the 'pid_value' in order to match the Files-REST bucket view
+        # signature. Store the value in Flask global request object for later
+        # usage.
         g.pid = values.pop('pid_value')
         pid, record = g.pid.data
+
+        # Retrieve bucket id from record. The record class must implement a
+        # simple interface (record.bucket_id) that allows this preprocessor to
+        # retrieve the bucket id.
         try:
-            # Check if the Record class has the property of files.
-            files = record.files
+            bucket_id = record.bucket_id
         except AttributeError:
             abort(404)
-        if files is not None:
-            values['bucket_id'] = str(record.resolve_files_to_bucket_id(files))
+
+        # Now check if we have a bucket id as we might have mixed records
+        # with and without buckets.
+        if bucket_id is not None:
+            values['bucket_id'] = str(record.bucket_id)
         else:
             abort(404)
 
@@ -82,6 +91,7 @@ def create_blueprint_from_app(app):
         original values of the request to be unchanged so that it can be
         reproduced.
         """
+        # Value here has been saved in above method (resolve_pid_to_bucket_id)
         values['pid_value'] = g.pid
 
     return records_files_blueprint
