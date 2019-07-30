@@ -10,6 +10,10 @@
 Changes
 =======
 
+Version 1.1.0 (released 2019-07-29)
+
+- Backward incompatible changes to API.
+
 Version 1.0.0 (released 2019-07-23)
 
 - Initial public release.
