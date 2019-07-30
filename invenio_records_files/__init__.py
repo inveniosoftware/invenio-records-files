@@ -61,30 +61,19 @@ You use Invenio-Records-Files basic API by importing
 
 >>> from invenio_records_files.api import Record
 
-This ``Record`` class has a special property ``files`` through which you can
-access and create files. By default this property is ``None``:
+This :py:data:`~invenio_records_files.api.Record` class has a special property
+``files`` through which you can access and create files. By default the
+class creates a bucket when you create a bucket:
 
 >>> record = Record.create({})
->>> record.files is None
-True
-
-This is because no bucket has been assigned to the record yet.
-
-Assigning a bucket
-~~~~~~~~~~~~~~~~~~
-You assign a bucket to a record through
-:py:data:`invenio_records_files.models.RecordsBuckets`:
-
->>> from invenio_files_rest.models import Bucket
->>> from invenio_records_files.models import RecordsBuckets
->>> bucket = Bucket.create()
->>> record_buckets = RecordsBuckets.create(record=record.model, bucket=bucket)
-
-The ``files`` property now has a value and you can e.g. get the number of
-files:
-
 >>> len(record.files)
 0
+
+You can also just create a record without an associated bucket:
+
+>>> record_nobucket = Record.create({}, with_bucket=False)
+>>> record_nobucket.files is None
+True
 
 Creating files
 --------------

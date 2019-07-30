@@ -13,7 +13,7 @@ from functools import wraps
 
 from invenio_db import db
 from invenio_files_rest.errors import InvalidOperationError
-from invenio_files_rest.models import ObjectVersion
+from invenio_files_rest.models import Bucket, ObjectVersion
 from invenio_records.api import Record as _Record
 from invenio_records.errors import MissingModelError
 
@@ -68,12 +68,14 @@ class FileObject(object):
     def dumps(self):
         """Create a dump of the metadata associated to the record."""
         self.data.update({
+            # The bucket id is also store here, in case we have records with
+            # multiple buckets associated.
             'bucket': str(self.obj.bucket_id),
             'checksum': self.obj.file.checksum,
+            'file_id': str(self.obj.file.id),
             'key': self.obj.key,  # IMPORTANT it must stay here!
             'size': self.obj.file.size,
             'version_id': str(self.obj.version_id),
-            'file_id': str(self.obj.file.id)
         })
         return self.data
 
@@ -251,25 +253,6 @@ class FilesMixin(object):
     :class:`~invenio_records_files.api.FilesIterator`
     """
 
-    def _create_bucket(self):
-        """Return an instance of ``Bucket`` class.
-
-        .. note:: Override for custom behavior.
-
-        :returns: Instance of :class:`invenio_files_rest.models.Bucket`.
-        """
-        return None
-
-    def resolve_files_to_bucket_id(self, files):
-        """Get bucket ID from record.
-
-        .. note:: Override for custom behavior.
-
-        :returns: UUID of record's bucket.
-        """
-        # Passing the record's files, not to query for it again.
-        return files.bucket.id
-
     @property
     def files(self):
         """Get files iterator.
@@ -283,10 +266,7 @@ class FilesMixin(object):
             record_id=self.id).first()
 
         if not records_buckets:
-            bucket = self._create_bucket()
-            if not bucket:
-                return None
-            RecordsBuckets.create(record=self.model, bucket=bucket)
+            return None
         else:
             bucket = records_buckets.bucket
 
@@ -303,7 +283,96 @@ class FilesMixin(object):
 
 
 class Record(_Record, FilesMixin):
-    """Define API for files manipulation using ``FilesMixin``."""
+    """Record class with associated bucket.
+
+    The record class implements a one-to-one relationship between a bucket and
+    a record. A bucket is automatically created and associated with the record
+    when the record is created with :py:data:`Record.create()` (unless
+    ``with_bucket`` is set to ``False``).
+
+    The bucket id is stored in the record metadata (by default in the
+    ``_bucket`` key). You can implement your dump/load behavior for the storing
+    the bucket id in the record (or possibly somewhere else). You do this by
+    creating a subclass of this class, and override the two classmethods
+    :py:data:`Record.dump_bucket()` and :py:data:`Record.load_bucket()`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the record."""
+        self._bucket = None
+        super(Record, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def create(cls, data, id_=None, with_bucket=True, **kwargs):
+        """Create a record and the associated bucket.
+
+        :param with_bucket: Create a bucket automatically on record creation.
+        """
+        # Create bucket and store in record metadata.
+        if with_bucket:
+            bucket = cls.create_bucket(data)
+            if bucket:
+                cls.dump_bucket(data, bucket)
+        # Create the record
+        record = super(Record, cls).create(data, id_=id_, **kwargs)
+        # Create link between record and bucket
+        if with_bucket and bucket:
+            RecordsBuckets.create(record=record.model, bucket=bucket)
+            record._bucket = bucket
+        return record
+
+    @classmethod
+    def create_bucket(cls, data):
+        """Create a bucket for this record.
+
+        Override this method to provide more advanced bucket creation
+        capabilities. This method may return a new or existing bucket, or may
+        return None, in case no bucket should be created.
+        """
+        return Bucket.create()
+
+    @classmethod
+    def dump_bucket(cls, data, bucket):
+        """Dump the bucket id into the record metadata.
+
+        Override this method to provide custom behavior for storing the bucket
+        id in the record metadata. By default the bucket id is stored in the
+        ``_bucket`` key. If you override this method, make sure you also
+        override :py:data:`Record.load_bucket()`.
+
+        This method is called after the bucket is created, but before the
+        record is created in the database.
+
+        :param data: A dictionary of the record metadata.
+        :param bucket: The created bucket for the record.
+        """
+        data['_bucket'] = str(bucket.id)
+
+    @classmethod
+    def load_bucket(cls, record):
+        """Load the bucket id from the record metadata.
+
+        Override this method to provide custom behavior for retriving the
+        bucket id from the record metadata. By default the bucket id is
+        retrieved from the ``_bucket`` key. If you override this method, make
+        sure you also  override :py:data:`Record.dump_bucket()`.
+
+        :param record: A record instance.
+        """
+        return record.get('_bucket')
+
+    @property
+    def bucket_id(self):
+        """Get bucket id from record metadata."""
+        return self.load_bucket(self)
+
+    @property
+    def bucket(self):
+        """Get bucket instance."""
+        if self._bucket is None:
+            if self.bucket_id:
+                self._bucket = Bucket.get(self.bucket_id)
+        return self._bucket
 
     def delete(self, force=False):
         """Delete a record and also remove the RecordsBuckets if necessary.

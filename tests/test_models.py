@@ -22,11 +22,9 @@ from invenio_records_files.models import RecordsBuckets
 
 
 @pytest.mark.parametrize('force,num_of_recordbuckets', [(False, 1), (True, 0)])
-def test_cascade_action_record_delete(app, db, location, record_with_bucket,
-                                      generic_file, force,
-                                      num_of_recordbuckets):
+def test_cascade_action_record_delete(app, db, location, record, generic_file,
+                                      force, num_of_recordbuckets):
     """Test cascade action on record delete, with force false."""
-    record = record_with_bucket
     record_id = record.id
     bucket_id = record.files.bucket.id
 
