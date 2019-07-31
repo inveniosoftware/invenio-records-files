@@ -63,7 +63,7 @@ You use Invenio-Records-Files basic API by importing
 
 This :py:data:`~invenio_records_files.api.Record` class has a special property
 ``files`` through which you can access and create files. By default the
-class creates a bucket when you create a bucket:
+class creates a bucket when you create a record:
 
 >>> record = Record.create({})
 >>> len(record.files)
