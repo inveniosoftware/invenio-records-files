@@ -72,16 +72,11 @@ def create_blueprint_from_app(app):
         # simple interface (record.bucket_id) that allows this preprocessor to
         # retrieve the bucket id.
         try:
-            bucket_id = record.bucket_id
-        except AttributeError:
-            abort(404)
-
-        # Now check if we have a bucket id as we might have mixed records
-        # with and without buckets.
-        if bucket_id is not None:
             values['bucket_id'] = str(record.bucket_id)
-        else:
-            abort(404)
+        except AttributeError:
+            # Hack, to make invenio_files_rest.views.as_uuid throw a
+            # ValueError instead of a TypeError if we set the value to None.
+            values['bucket_id'] = ''
 
     @records_files_blueprint.url_defaults
     def restore_pid_to_url(endpoint, values):
