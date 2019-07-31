@@ -68,7 +68,7 @@ class FileObject(object):
     def dumps(self):
         """Create a dump of the metadata associated to the record."""
         self.data.update({
-            # The bucket id is also store here, in case we have records with
+            # The bucket id is also stored here, in case we have records with
             # multiple buckets associated.
             'bucket': str(self.obj.bucket_id),
             'checksum': self.obj.file.checksum,
@@ -291,9 +291,9 @@ class Record(_Record, FilesMixin):
     ``with_bucket`` is set to ``False``).
 
     The bucket id is stored in the record metadata (by default in the
-    ``_bucket`` key). You can implement your dump/load behavior for the storing
+    ``_bucket`` key). You can implement your dump/load behavior for storing
     the bucket id in the record (or possibly somewhere else). You do this by
-    creating a subclass of this class, and override the two classmethods
+    creating a subclass of this class, and overriding the two classmethods
     :py:data:`Record.dump_bucket()` and :py:data:`Record.load_bucket()`.
     """
 
