@@ -94,6 +94,12 @@ setup(
         'invenio_jsonschemas.schemas': [
             'records_files = invenio_records_files.jsonschemas',
         ],
+        'invenio_base.apps': [
+            'invenio_records_files = invenio_records_files:InvenioRecordsFiles'
+        ],
+        'invenio_base.api_apps': [
+            'invenio_records_files = invenio_records_files:InvenioRecordsFiles'
+        ],
         'invenio_base.api_blueprints': [
             'invenio_records_files = invenio_records_files.'
             'views:create_blueprint_from_app',
