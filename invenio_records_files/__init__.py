@@ -166,6 +166,7 @@ of a record:
 
     # Upload a file named example.txt to the record with pid of 1
     $ curl -X PUT http://localhost:5000/api/records/1/files/example.txt \
+           -H "Content-Type: application/octet-stream" \
            --data-binary @example.txt
 
     # Get the list of files for this record
