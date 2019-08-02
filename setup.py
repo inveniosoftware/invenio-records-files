@@ -19,7 +19,6 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'invenio-indexer>=1.0.0',
-    'invenio-records-rest>=1.4.2',
     'invenio-search[elasticsearch6]>=1.0.0',
     'isort>=4.3.4',
     'mock>=1.3.0',
@@ -59,6 +58,7 @@ install_requires = [
     'Flask>=0.11.1',
     'invenio-files-rest>=1.0.3',
     'invenio-records>=1.0.0',
+    'invenio-records-rest>=1.4.2',
 ]
 
 packages = find_packages()
