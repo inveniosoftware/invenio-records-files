@@ -86,7 +86,10 @@ def create_blueprint_from_app(app):
         original values of the request to be unchanged so that it can be
         reproduced.
         """
-        # Value here has been saved in above method (resolve_pid_to_bucket_id)
-        values['pid_value'] = g.pid
+        # NOTE: In some cases the preprocessor is not executed, i.e. url_for,
+        # and g does not contain pid
+        if hasattr(g, 'pid'):
+            # Value here saved in above method (resolve_pid_to_bucket_id)
+            values['pid_value'] = g.pid
 
     return records_files_blueprint

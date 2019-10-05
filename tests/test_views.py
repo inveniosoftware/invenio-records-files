@@ -13,6 +13,7 @@ from __future__ import absolute_import, print_function
 
 import json
 
+from flask import url_for
 from six import BytesIO
 
 
@@ -62,3 +63,16 @@ def test_record_no_files(app, db, client, location, minted_record_no_bucket):
         data=b'test example'
     )
     assert res.status_code == 404
+
+
+def test_url_for(app):
+    """Test Flask ``url_for`` correct functioning."""
+    with app.test_request_context():
+        url = url_for('invenio_records_files.bucket_api', pid_value=123)
+    assert url == '/records/123/files'
+
+    with app.test_request_context():
+        url = url_for(
+            'invenio_records_files.object_api', pid_value=123, key='test.txt'
+        )
+    assert url == '/records/123/files/test.txt'
