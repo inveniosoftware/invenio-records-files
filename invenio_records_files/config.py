@@ -19,7 +19,7 @@ files as follows:
 
     RECORDS_FILES_REST_ENDPOINTS = {
         '<*_REST_ENDPOINTS>': {
-            '<record_pid_type>': '<endpoint_suffix>',
+            '<endpoint_name>': '<endpoint_suffix>',
         }
     }
 
@@ -28,8 +28,8 @@ files as follows:
   latest/configuration.html#invenio_records_rest.config
   .RECORDS_REST_ENDPOINTS>`_ you have defined in your application.
 
-* ``<record_pid_type>`` is the PID type associated to the record defined in
-  your `Invenio-Records-REST <https://invenio-records-rest.readthedocs.io/en/
+* ``<endpoint_name>`` is the unique name of your endpoint as you can see in
+ `Invenio-Records-REST <https://invenio-records-rest.readthedocs.io/en/
   latest/configuration.html#invenio_records_rest.
   config.RECORDS_REST_ENDPOINTS>`_ like configuration.
 

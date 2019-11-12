@@ -21,13 +21,11 @@ def test_records_files_rest_integration(app, client, location, minted_record):
     pid, record = minted_record
     test_data = b'test example'
     file_key = 'test.txt'
-
     # Upload a file.
     res = client.put(
         '/records/{0}/files/{1}'.format(pid.id, file_key),
         data=test_data)
     assert res.status_code == 200
-
     # Get the list of the records files.
     res = client.get('/records/{0}/files'.format(pid.id))
     assert json.loads(

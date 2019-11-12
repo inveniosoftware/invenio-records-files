@@ -10,12 +10,21 @@
 
 from __future__ import absolute_import, print_function
 
+from functools import partial, wraps
+
 from flask import Blueprint, abort, g, request
-from invenio_files_rest.views import bucket_view, object_view
+from invenio_files_rest.serializer import json_serializer
+from invenio_files_rest.views import BucketResource, ObjectResource
+from invenio_records_rest.views import pass_record
+from invenio_rest import ContentNegotiatedMethodView
+from marshmallow import missing
 from six import iteritems
 from six.moves.urllib.parse import urljoin
+from webargs.flaskparser import use_kwargs
 
 from invenio_records_files.models import RecordsBuckets
+
+from .serializer import serializer_mapping
 
 
 def create_blueprint_from_app(app):
@@ -31,13 +40,33 @@ def create_blueprint_from_app(app):
 
     for config_name, endpoints_to_register in \
             iteritems(app.config['RECORDS_FILES_REST_ENDPOINTS']):
-        for endpoint_to_register in endpoints_to_register:
+        for endpoint_prefix in endpoints_to_register:
             record_item_path = \
-                app.config[config_name][endpoint_to_register]['item_route']
+                app.config[config_name][endpoint_prefix]['item_route']
             files_resource_endpoint_suffix = \
-                endpoints_to_register[endpoint_to_register]
+                endpoints_to_register[endpoint_prefix]
             files_resource_endpoint_suffix = \
                 urljoin('/', files_resource_endpoint_suffix)
+            bucket_view = RecordBucketResource.as_view(
+                endpoint_prefix + '_bucket_api',
+                serializers={
+                    'application/json':
+                        partial(
+                            json_serializer,
+                            view_name="{}_bucket_api".format(endpoint_prefix),
+                            serializer_mapping=serializer_mapping),
+                }
+            )
+            object_view = RecordObjectResource.as_view(
+                endpoint_prefix + '_object_api',
+                serializers={
+                    'application/json':
+                        partial(
+                            json_serializer,
+                            view_name="{}_object_api".format(endpoint_prefix),
+                            serializer_mapping=serializer_mapping),
+                }
+            )
             records_files_blueprint.add_url_rule(
                 '{record_item_path}{files_resource_endpoint_suffix}'
                 .format(**locals()),
@@ -49,44 +78,83 @@ def create_blueprint_from_app(app):
                 view_func=object_view,
             )
 
-    @records_files_blueprint.url_value_preprocessor
-    def resolve_pid_to_bucket_id(endpoint, values):
-        """Flask URL preprocessor to resolve pid to Bucket ID.
-
-        In the ``records_files_blueprint`` we are gluing together Records-REST
-        and Files-REST APIs. Records-REST knows about PIDs but Files-REST does
-        not, this function will pre-process the URL so the PID is removed from
-        the URL and resolved to bucket ID which is injected into Files-REST
-        view calls:
-
-        ``/api/<record_type>/<pid_value>/files/<key>`` ->
-        ``/files/<bucket>/<key>``.
-        """
-        # Remove the 'pid_value' in order to match the Files-REST bucket view
-        # signature. Store the value in Flask global request object for later
-        # usage.
-        g.pid = values.pop('pid_value')
-        pid, record = g.pid.data
-
-        # Retrieve bucket id from record. The record class must implement a
-        # simple interface (record.bucket_id) that allows this preprocessor to
-        # retrieve the bucket id.
-        try:
-            values['bucket_id'] = str(record.bucket_id)
-        except AttributeError:
-            # Hack, to make invenio_files_rest.views.as_uuid throw a
-            # ValueError instead of a TypeError if we set the value to None.
-            values['bucket_id'] = ''
-
-    @records_files_blueprint.url_defaults
-    def restore_pid_to_url(endpoint, values):
-        """Put ``pid_value`` back to the URL after matching Files-REST views.
-
-        Since we are computing the URL more than one times, we need the
-        original values of the request to be unchanged so that it can be
-        reproduced.
-        """
-        # Value here has been saved in above method (resolve_pid_to_bucket_id)
-        values['pid_value'] = g.pid
-
     return records_files_blueprint
+
+
+def pass_bucket_id(f):
+    """Decorate to retrieve a bucket."""
+    @wraps(f)
+    def decorate(*args, **kwargs):
+        # We need to make sure to pass an empty string and not None which can
+        # be the property's value if it is a Record with files,
+        # but no attached bucket
+        kwargs['bucket_id'] = getattr(kwargs['record'], 'bucket_id', '') or ''
+        return f(*args, **kwargs)
+    return decorate
+
+
+class RecordBucketResource(BucketResource):
+    """RecordBucket item resource."""
+
+    @pass_record
+    @pass_bucket_id
+    def get(self, pid, record, **kwargs):
+        """Get list of objects in the bucket.
+
+        :param bucket: A :class:`invenio_files_rest.models.Bucket` instance.
+        :kwargs: contains all the parameters used by the ObjectResource view in
+            Invenio-Files-Rest
+        :returns: The Flask response.
+        """
+        return super(RecordBucketResource, self).get(**kwargs)
+
+    @pass_record
+    @pass_bucket_id
+    def head(self, pid, record, **kwargs):
+        """Check the existence of the bucket.
+
+        :param pid: The pid value of the record to get the bucket from.
+        :kwargs: contains all the parameters used by the ObjectResource view in
+            Invenio-Files-Rest
+        """
+        return super(RecordBucketResource, self).head(**kwargs)
+
+
+class RecordObjectResource(ObjectResource):
+    """RecordObject item resource."""
+
+    @pass_record
+    @pass_bucket_id
+    def get(self, pid, record, **kwargs):
+        """Get object or list parts of a multpart upload.
+
+        :param pid: The pid value of the record to get the bucket from.
+        :kwargs: contains all the parameters used by the ObjectResource view in
+            Invenio-Files-Rest
+        :returns: A Flask response.
+        """
+        return super(RecordObjectResource, self).get(**kwargs)
+
+    @pass_record
+    @pass_bucket_id
+    def put(self, pid, record, **kwargs):
+        """Update a new object or upload a part of a multipart upload.
+
+        :param pid: The pid value of the record to get the bucket from.
+        :kwargs: contains all the parameters used by the ObjectResource view in
+            Invenio-Files-Rest
+        :returns: A Flask response.
+        """
+        return super(RecordObjectResource, self).put(**kwargs)
+
+    @pass_record
+    @pass_bucket_id
+    def delete(self, pid, record, **kwargs):
+        """Delete an object or abort a multipart upload.
+
+        :param pid: The pid value of the record to get the bucket from.
+        :kwargs: contains all the parameters used by the ObjectResource view in
+            Invenio-Files-Rest
+        :returns: A Flask response.
+        """
+        return super(RecordObjectResource, self).delete(**kwargs)

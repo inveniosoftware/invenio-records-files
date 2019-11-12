@@ -145,10 +145,10 @@ def app(request, docid_record_type_endpoint, basic_record_type_endpoint):
     InvenioRecordsREST(app_)
     InvenioRecordsFiles(app_)
     app_.register_blueprint(files_rest_blueprint)
-    app_.register_blueprint(create_blueprint_from_app(app_))
     app_.register_blueprint(records_rest_create_blueprint_from_app(app_))
     search = InvenioSearch(app_)
     search.register_mappings('records-files', 'data')
+    app_.register_blueprint(create_blueprint_from_app(app_))
 
     with app_.app_context():
         yield app_
