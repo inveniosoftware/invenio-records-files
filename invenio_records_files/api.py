@@ -36,8 +36,9 @@ class FileObject(object):
         :returns: :class:`~invenio_files_rest.models.ObjectVersion` instance or
             HEAD of the stored object.
         """
-        return ObjectVersion.get(bucket=self.obj.bucket, key=self.obj.key,
-                                 version_id=version_id)
+        return ObjectVersion.get(
+            bucket=self.obj.bucket, key=self.obj.key, version_id=version_id
+        )
 
     def get(self, key, default=None):
         """Proxy to ``obj``.
@@ -67,16 +68,16 @@ class FileObject(object):
 
     def dumps(self):
         """Create a dump of the metadata associated to the record."""
-        self.data.update({
-            # The bucket id is also stored here, in case we have records with
-            # multiple buckets associated.
-            'bucket': str(self.obj.bucket_id),
-            'checksum': self.obj.file.checksum,
-            'file_id': str(self.obj.file.id),
-            'key': self.obj.key,  # IMPORTANT it must stay here!
-            'size': self.obj.file.size,
-            'version_id': str(self.obj.version_id),
-        })
+        self.data.update(
+            {
+                "bucket": str(self.obj.bucket_id),
+                "checksum": self.obj.file.checksum,
+                "file_id": str(self.obj.file.id),
+                "key": self.obj.key,  # IMPORTANT it must stay here!
+                "size": self.obj.file.size,
+                "version_id": str(self.obj.version_id),
+            }
+        )
         return self.data
 
 
@@ -98,6 +99,7 @@ def _writable(method):
         if self.bucket.locked or self.bucket.deleted:
             raise InvalidOperationError()
         return method(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -111,9 +113,9 @@ class FilesIterator(object):
         self.model = record.model
         self.file_cls = file_cls or FileObject
         self.bucket = bucket
-        self.filesmap = OrderedDict([
-            (f['key'], f) for f in self.record.get('_files', [])
-        ])
+        self.filesmap = OrderedDict(
+            [(f["key"], f) for f in self.record.get("_files", [])]
+        )
 
     @property
     def keys(self):
@@ -140,8 +142,9 @@ class FilesIterator(object):
 
     def __contains__(self, key):
         """Test if file exists."""
-        return ObjectVersion.get_by_bucket(
-            self.bucket).filter_by(key=key).count()
+        return (
+            ObjectVersion.get_by_bucket(self.bucket).filter_by(key=key).count()
+        )
 
     def __getitem__(self, key):
         """Get a specific file."""
@@ -155,8 +158,8 @@ class FilesIterator(object):
         files = self.dumps()
         # Do not create `_files` when there has not been `_files` field before
         # and the record still has no files attached.
-        if files or '_files' in self.record:
-            self.record['_files'] = files
+        if files or "_files" in self.record:
+            self.record["_files"] = files
 
     @_writable
     def __setitem__(self, key, stream):
@@ -164,7 +167,8 @@ class FilesIterator(object):
         with db.session.begin_nested():
             # save the file
             obj = ObjectVersion.create(
-                bucket=self.bucket, key=key, stream=stream)
+                bucket=self.bucket, key=key, stream=stream
+            )
             self.filesmap[key] = self.file_cls(obj, {}).dumps()
             self.flush()
 
@@ -187,11 +191,12 @@ class FilesIterator(object):
         """
         # Support sorting by file_ids or keys.
         files = {str(f_.file_id): f_.key for f_ in self}
-        # self.record['_files'] = [{'key': files.get(id_, id_)} for id_ in ids]
-        self.filesmap = OrderedDict([
-            (files.get(id_, id_), self[files.get(id_, id_)].dumps())
-            for id_ in ids
-        ])
+        self.filesmap = OrderedDict(
+            [
+                (files.get(id_, id_), self[files.get(id_, id_)].dumps())
+                for id_ in ids
+            ]
+        )
         self.flush()
 
     @_writable
@@ -210,8 +215,7 @@ class FilesIterator(object):
 
         # Create a new version with the new name
         obj = ObjectVersion.create(
-            bucket=self.bucket, key=new_key,
-            _file_id=file_.obj.file_id
+            bucket=self.bucket, key=new_key, _file_id=file_.obj.file_id
         )
 
         # Delete old key
@@ -263,7 +267,8 @@ class FilesMixin(object):
             raise MissingModelError()
 
         records_buckets = RecordsBuckets.query.filter_by(
-            record_id=self.id).first()
+            record_id=self.id
+        ).first()
 
         if not records_buckets:
             return None
@@ -277,7 +282,7 @@ class FilesMixin(object):
         """Set files from data."""
         current_files = self.files
         if current_files:
-            raise RuntimeError('Can not update existing files.')
+            raise RuntimeError("Can not update existing files.")
         for key in data:
             current_files[key] = data[key]
 
@@ -346,20 +351,20 @@ class Record(_Record, FilesMixin):
         :param data: A dictionary of the record metadata.
         :param bucket: The created bucket for the record.
         """
-        data['_bucket'] = str(bucket.id)
+        data["_bucket"] = str(bucket.id)
 
     @classmethod
     def load_bucket(cls, record):
         """Load the bucket id from the record metadata.
 
-        Override this method to provide custom behavior for retriving the
+        Override this method to provide custom behavior for retrieving the
         bucket id from the record metadata. By default the bucket id is
         retrieved from the ``_bucket`` key. If you override this method, make
         sure you also  override :py:data:`Record.dump_bucket()`.
 
         :param record: A record instance.
         """
-        return record.get('_bucket')
+        return record.get("_bucket", "")
 
     @property
     def bucket_id(self):
@@ -383,7 +388,6 @@ class Record(_Record, FilesMixin):
         """
         if force:
             RecordsBuckets.query.filter_by(
-                record=self.model,
-                bucket=self.files.bucket
+                record=self.model, bucket=self.files.bucket
             ).delete()
         return super(Record, self).delete(force)

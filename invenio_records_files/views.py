@@ -12,17 +12,12 @@ from __future__ import absolute_import, print_function
 
 from functools import partial, wraps
 
-from flask import Blueprint, abort, g, request
+from flask import Blueprint
 from invenio_files_rest.serializer import json_serializer
 from invenio_files_rest.views import BucketResource, ObjectResource
 from invenio_records_rest.views import pass_record
-from invenio_rest import ContentNegotiatedMethodView
-from marshmallow import missing
 from six import iteritems
 from six.moves.urllib.parse import urljoin
-from webargs.flaskparser import use_kwargs
-
-from invenio_records_files.models import RecordsBuckets
 
 from .serializer import serializer_mapping
 
@@ -34,47 +29,47 @@ def create_blueprint_from_app(app):
     :returns: Configured blueprint.
     """
     records_files_blueprint = Blueprint(
-        'invenio_records_files',
-        __name__,
-        url_prefix='')
+        "invenio_records_files", __name__, url_prefix=""
+    )
 
-    for config_name, endpoints_to_register in \
-            iteritems(app.config['RECORDS_FILES_REST_ENDPOINTS']):
-        for endpoint_prefix in endpoints_to_register:
-            record_item_path = \
-                app.config[config_name][endpoint_prefix]['item_route']
-            files_resource_endpoint_suffix = \
-                endpoints_to_register[endpoint_prefix]
-            files_resource_endpoint_suffix = \
-                urljoin('/', files_resource_endpoint_suffix)
+    for rest_endpoint_config, rec_files_mappings in iteritems(
+        app.config["RECORDS_FILES_REST_ENDPOINTS"]
+    ):
+        for endpoint_prefix, files_path_name in iteritems(rec_files_mappings):
+            # e.g. /api/records/<recid>
+            rec_item_route = app.config[rest_endpoint_config][endpoint_prefix][
+                "item_route"
+            ]
+            # e.g. /files
+            files_path_name = urljoin("/", files_path_name)
             bucket_view = RecordBucketResource.as_view(
-                endpoint_prefix + '_bucket_api',
+                endpoint_prefix + "_bucket_api",
                 serializers={
-                    'application/json':
-                        partial(
-                            json_serializer,
-                            view_name="{}_bucket_api".format(endpoint_prefix),
-                            serializer_mapping=serializer_mapping),
-                }
+                    "application/json": partial(
+                        json_serializer,
+                        view_name="{}_bucket_api".format(endpoint_prefix),
+                        serializer_mapping=serializer_mapping,
+                    )
+                },
             )
             object_view = RecordObjectResource.as_view(
-                endpoint_prefix + '_object_api',
+                endpoint_prefix + "_object_api",
                 serializers={
-                    'application/json':
-                        partial(
-                            json_serializer,
-                            view_name="{}_object_api".format(endpoint_prefix),
-                            serializer_mapping=serializer_mapping),
-                }
+                    "application/json": partial(
+                        json_serializer,
+                        view_name="{}_object_api".format(endpoint_prefix),
+                        serializer_mapping=serializer_mapping,
+                    )
+                },
             )
             records_files_blueprint.add_url_rule(
-                '{record_item_path}{files_resource_endpoint_suffix}'
-                .format(**locals()),
+                "{rec_item_route}{files_path_name}".format(**locals()),
                 view_func=bucket_view,
             )
             records_files_blueprint.add_url_rule(
-                '{record_item_path}{files_resource_endpoint_suffix}/<path:key>'
-                .format(**locals()),
+                "{rec_item_route}{files_path_name}/<path:key>".format(
+                    **locals()
+                ),
                 view_func=object_view,
             )
 
@@ -85,11 +80,10 @@ def pass_bucket_id(f):
     """Decorate to retrieve a bucket."""
     @wraps(f)
     def decorate(*args, **kwargs):
-        # We need to make sure to pass an empty string and not None which can
-        # be the property's value if it is a Record with files,
-        # but no attached bucket
-        kwargs['bucket_id'] = getattr(kwargs['record'], 'bucket_id', '') or ''
+        """Get the bucket id from the record and pass it as kwarg."""
+        kwargs["bucket_id"] = getattr(kwargs["record"], "bucket_id", "")
         return f(*args, **kwargs)
+
     return decorate
 
 
