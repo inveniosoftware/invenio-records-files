@@ -8,7 +8,7 @@
 
 """Link for file bucket creation."""
 
-from flask import current_app, url_for
+from flask import url_for
 from invenio_records_rest import current_records_rest
 
 from .api import Record
@@ -27,7 +27,7 @@ def default_bucket_link_factory(pid):
 
 
 def default_record_files_links_factory(pid, record=None, **kwargs):
-    """Factory for record links generation.
+    """Factory for record files links generation.
 
     :param pid: A Persistent Identifier instance.
     :returns: Dictionary containing a list of useful links for the record.

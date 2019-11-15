@@ -12,12 +12,10 @@
 from __future__ import absolute_import, print_function
 
 import mock
-import pytest
-from flask import g, url_for
-from invenio_files_rest.models import Bucket
+from flask import url_for
 from invenio_records.models import RecordMetadata
 
-from invenio_records_files.api import Record, RecordsBuckets
+from invenio_records_files.api import RecordsBuckets
 from invenio_records_files.links import default_bucket_link_factory, \
     default_record_files_links_factory
 
@@ -37,8 +35,10 @@ def test_bucket_link_factory_has_bucket(app, db, location, bucket):
         pid = mock.Mock()
         pid.get_assigned_object.return_value = record.id
         assert default_bucket_link_factory(pid) == url_for(
-            'invenio_files_rest.bucket_api', bucket_id=bucket.id,
-            _external=True)
+            "invenio_files_rest.bucket_api",
+            bucket_id=bucket.id,
+            _external=True,
+        )
 
 
 def test_record_files_link_factory(app, db, location, bucket):
@@ -50,10 +50,10 @@ def test_record_files_link_factory(app, db, location, bucket):
             db.session.add(record)
         pid = mock.Mock()
         pid.pid_value = 1
-        pid.pid_type = 'recid'
+        pid.pid_type = "recid"
         pid.get_assigned_object.return_value = record.id
         links = default_record_files_links_factory(pid)
         assert links == {
-            'files': 'http://localhost/records/1/files',
-            'self': 'http://localhost/records/1'
+            "files": "http://localhost/records/1/files",
+            "self": "http://localhost/records/1",
         }

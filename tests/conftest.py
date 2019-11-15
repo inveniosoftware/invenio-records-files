@@ -12,7 +12,6 @@
 from __future__ import absolute_import, print_function
 
 import imp
-import json
 import os
 import shutil
 import sys
@@ -22,7 +21,6 @@ from copy import deepcopy
 
 import pytest
 from flask import Flask
-from flask_login import LoginManager
 from invenio_db import InvenioDB
 from invenio_db import db as db_
 from invenio_files_rest import InvenioFilesREST
@@ -42,26 +40,17 @@ from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
 from invenio_records_files import InvenioRecordsFiles
-from invenio_records_files.api import FilesMixin, Record, RecordsBuckets
+from invenio_records_files.api import Record
 from invenio_records_files.views import create_blueprint_from_app
 
 
 @pytest.fixture
 def docid_record_type_endpoint():
-    """."""
+    """Provide configuration for `recid` endpoint."""
     docid = deepcopy(RECORDS_REST_ENDPOINTS['recid'])
     docid['list_route'] = '/doc/'
     docid['item_route'] = '/doc/<pid(recid):pid_value>'
     return docid
-
-
-@pytest.fixture
-def basic_record_type_endpoint():
-    """."""
-    basic = deepcopy(RECORDS_REST_ENDPOINTS['recid'])
-    basic['list_route'] = '/basic/'
-    basic['item_route'] = '/basic/<pid(recid):pid_value>'
-    return basic
 
 
 @pytest.fixture()
@@ -89,17 +78,15 @@ def RecordWithoutFilesCreation():
 
 
 @pytest.yield_fixture()
-def app(request, docid_record_type_endpoint, basic_record_type_endpoint):
+def app(request, docid_record_type_endpoint):
     """Flask application fixture."""
-    from invenio_records.api import Record
     from invenio_records_files.api import Record as RecordFiles
 
     instance_path = tempfile.mkdtemp()
     app_ = Flask(__name__, instance_path=instance_path)
 
     RECORDS_REST_ENDPOINTS.update(
-        docid=docid_record_type_endpoint,
-        basic=basic_record_type_endpoint
+        docid=docid_record_type_endpoint
     )
 
     # Endpoint with files support
@@ -108,13 +95,6 @@ def app(request, docid_record_type_endpoint, basic_record_type_endpoint):
         '/records/<pid(recid, ' \
         'record_class="invenio_records_files.api.Record"):pid_value>'
     RECORDS_REST_ENDPOINTS['recid']['indexer_class'] = None
-
-    # Endpoint without files support
-    RECORDS_REST_ENDPOINTS['basic']['record_class'] = Record
-    RECORDS_REST_ENDPOINTS['basic']['item_route'] = \
-        '/records/<pid(recid, ' \
-        'record_class="invenio_records.api.Record"):pid_value>'
-    RECORDS_REST_ENDPOINTS['basic']['indexer_class'] = None
 
     # Application
     app_.config.update(
@@ -129,7 +109,7 @@ def app(request, docid_record_type_endpoint, basic_record_type_endpoint):
         RECORDS_FILES_REST_ENDPOINTS={
             'RECORDS_REST_ENDPOINTS': {
                 'recid': 'files',
-                'basic': 'nofiles',
+                'docid': 'nofiles',
             }
         },
         RECORDS_REST_ENDPOINTS=RECORDS_REST_ENDPOINTS,

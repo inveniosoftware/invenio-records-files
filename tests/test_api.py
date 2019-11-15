@@ -13,7 +13,6 @@ from __future__ import absolute_import, print_function
 import pytest
 from invenio_files_rest.errors import InvalidOperationError
 from invenio_files_rest.models import Bucket, ObjectVersion
-from invenio_records.api import Record as BaseRecord
 from invenio_records.errors import MissingModelError
 from six import BytesIO
 
