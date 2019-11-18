@@ -55,9 +55,8 @@ Here you will create a location in a temporary directory:
 
 Creating a record
 -----------------
-You use Invenio-Records-Files basic API by importing
-:py:class:`invenio_records_files.api.Record` instead of
-:py:class:`invenio_records.api.Record`:
+Import Invenio-Records-Files basic API
+:py:class:`invenio_records_files.api.Record`:
 
 >>> from invenio_records_files.api import Record
 
@@ -115,7 +114,7 @@ KeyError: 'key'
 The reserved key names are all the properties which already exist in
 :py:class:`invenio_files_rest.models.ObjectVersion`.
 
-You can however still use the reserved keys for **getting** metadata:
+You can however still use the reserved keys for getting metadata:
 
 >>> print(fileobj['key'])
 hello.txt
@@ -146,7 +145,7 @@ record.
 hello.txt
 
 
-If a file does not exist or the record class has no files property, the
+If the file does not exist or the record class has no files property, the
 factory will return ``None``:
 
 >>> fileobj = record_file_factory(None, record, 'invalid')
@@ -155,7 +154,7 @@ True
 
 Some other Invenio modules such as
 `Invenio-Previewer <https://invenio-previewer.rtfd.io/>`_
-already use it to programmatically access record's files.
+already uses it to programmatically access record's files.
 
 Integration with Invenio REST API
 ---------------------------------
