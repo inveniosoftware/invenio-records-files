@@ -12,7 +12,6 @@
 from __future__ import absolute_import, print_function
 
 import pytest
-from invenio_db import db
 from invenio_files_rest.models import Bucket, ObjectVersion
 from six import BytesIO
 from sqlalchemy.orm.exc import NoResultFound

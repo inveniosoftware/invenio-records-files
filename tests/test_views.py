@@ -13,11 +13,13 @@ from __future__ import absolute_import, print_function
 
 import json
 
-from six import BytesIO
+import pytest
+
+from invenio_records_files.views import create_blueprint_from_app
 
 
 def test_records_files_rest_integration(app, client, location, minted_record):
-    """Test Records Files Views"""
+    """Test Records Files Views."""
     pid, record = minted_record
     test_data = b'test example'
     file_key = 'test.txt'
@@ -60,3 +62,14 @@ def test_record_no_files(app, db, client, location, minted_record_no_bucket):
         data=b'test example'
     )
     assert res.status_code == 404
+
+
+def test_misconfiguration_of_views(app):
+    """Test error raised in case of misconfiguration of views."""
+    app.config.update(
+        RECORDS_FILES_REST_ENDPOINTS={
+            'RECORDS_REST_ENDPOINTS': {
+                'missing': 'files',
+            }})
+    with pytest.raises(ValueError):
+        create_blueprint_from_app(app)

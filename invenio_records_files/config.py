@@ -24,14 +24,17 @@ files as follows:
     }
 
 * ``<*_REST_ENDPOINTS>`` corresponds to `Invenio-Records-REST endpoint
-  configurations names <https://invenio-records-rest.readthedocs.io/en/
-  latest/configuration.html#invenio_records_rest.config
-  .RECORDS_REST_ENDPOINTS>`_ you have defined in your application.
+  configurations names
+  <https://invenio-records-rest.readthedocs.io/en/latest/configuration.html
+  #invenio_records_rest.config.RECORDS_REST_ENDPOINTS>`_
+  that you have defined in your application.
 
-* ``<endpoint-prefix>`` is the unique name of your endpoint as you can see in
-  `Invenio-Records-REST <https://invenio-records-rest.readthedocs.io/en/
-  latest/configuration.html#invenio_records_rest.
-  config.RECORDS_REST_ENDPOINTS>`_ like configuration.
+* ``<endpoint-prefix>`` is the unique name of the endpoint configuration as it
+  is defined in `Invenio-Records-REST
+  <https://invenio-records-rest.readthedocs.io/en/latest/configuration.html
+  #invenio_records_rest.config.RECORDS_REST_ENDPOINTS>`_ like configuration.
+  This needs to match an already existing endpoint name in the
+  `<*_REST_ENDPOINTS>` configuration.
 
 * ``<endpoint-suffix>`` is the endpoint path name to access the record's files.
 

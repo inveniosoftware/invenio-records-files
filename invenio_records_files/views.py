@@ -36,6 +36,10 @@ def create_blueprint_from_app(app):
         app.config["RECORDS_FILES_REST_ENDPOINTS"]
     ):
         for endpoint_prefix, files_path_name in iteritems(rec_files_mappings):
+            if endpoint_prefix not in app.config[rest_endpoint_config]:
+                raise ValueError(
+                    'Endpoint {0} is not present in {1}'.format(
+                        endpoint_prefix, rest_endpoint_config))
             # e.g. /api/records/<recid>
             rec_item_route = app.config[rest_endpoint_config][endpoint_prefix][
                 "item_route"
