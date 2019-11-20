@@ -10,6 +10,11 @@
 Changes
 =======
 
+Version 1.2.0 (released 2019-11-19)
+
+- Adds link factory for files and record
+- Fixes the blueprints building
+
 Version 1.1.1 (released 2019-07-31)
 
 - Fixes missing entry point definition for the extension, causing the extension
