@@ -10,6 +10,11 @@
 Changes
 =======
 
+Version 1.2.1 (released 2019-11-21)
+
+- increase invenio-files-rest version to provide signals for d
+  eletion and uploading files
+
 Version 1.2.0 (released 2019-11-19)
 
 - Adds link factory for files and record
