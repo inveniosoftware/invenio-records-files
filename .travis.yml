@@ -9,7 +9,7 @@
 notifications:
   email: false
 
-sudo: false
+dist: xenial
 
 language: python
 
@@ -18,15 +18,12 @@ cache:
 
 # Note: dist/sudo/api is required for MySQL 5.6 which adds support for
 # fractional seconds in datetime columns.
-dist: trusty
-sudo: required
+
+services:
+  - mysql
+
 addons:
    postgresql: "9.4"
-   apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
 
 env:
   - REQUIREMENTS=lowest EXTRAS=all,sqlite SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
@@ -40,8 +37,8 @@ env:
   - REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
 
 python:
-  - "2.7"
-  - "3.5"
+  - "3.6"
+  - "3.7"
 
 matrix:
   fast_finish: true
@@ -76,7 +73,5 @@ deploy:
     secure: "rg1FtV6OpuFqW0afRSEe5gFRnOcQukEL9gDd8NYCYIkSBxvWuPY3FR33hrrLrC9FTMJXOJ1vlF3szt/51l+ZxhVJkxp5nEmaxzfPpN79npRU6tTB/Pe3ctDaWzJsAD9pLCUCXc5LQUtyOR7YzCuqa5dXHaUcaH1/CoaLA1NPtkSoTUMq+JGjFndT8v6gQxG2EnvQ00V0Axq7FizgdQQARlIBG4zXTgbb0/oGvCAMoUbqAHEBvLYX7PlbVRzeAhoLK+t648vmnPfaBDQEe3WCfDvmVBZTqVmYwyPdnk0cc0ZkDvnRG0kvhXJIHK8xZh+40ekEsmDERUA9fVOW7nAaOoJxqvU3fvIX0/rT/4/XW4vBiZgpF1vdI3HRYRTVSpi9MtyGzkpVzMFzUAmI5wAqmpdori8YggHjzUyrG8uxFmBt2emB5CBI2wU8BywwuAwzp6K61dsp2SWuDqXlNGoUSLfaC4H9O1gana3vSp+YurwKr9SnUbZcuct8Nm4P5hP+vMwQbQ2fyQqB3LVDPkqmo6SQTrO4lhENoGSe1sRyyMz01HOyA01QQJZddgr+ha86R5gJpRtLF37wM0nwQE9UPOKssxh48UhHkAfUClWbzd53u9XcvUtMOHGdcBlwKRJXqVhqFfeV+vZqhsAtB3GuJcbr3ASJ4VRczAZMoIH3zHQ="
   distributions: sdist bdist_wheel
   on:
-    condition: $REQUIREMENTS = release
-    python: "2.7"
-    repo: inveniosoftware/invenio-records-files
     tags: true
+  skip_existing: true
