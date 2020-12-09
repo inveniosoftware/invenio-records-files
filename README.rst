@@ -13,8 +13,8 @@
 .. image:: https://img.shields.io/github/license/inveniosoftware/invenio-records-files.svg
         :target: https://github.com/inveniosoftware/invenio-records-files/blob/master/LICENSE
 
-.. image:: https://img.shields.io/travis/inveniosoftware/invenio-records-files.svg
-        :target: https://travis-ci.org/inveniosoftware/invenio-records-files
+.. image:: https://github.com/inveniosoftware/invenio-records-files/workflows/CI/badge.svg
+        :target: https://github.com/inveniosoftware/invenio-records-files/actions?query=workflow%3ACI
 
 .. image:: https://img.shields.io/coveralls/inveniosoftware/invenio-records-files.svg
         :target: https://coveralls.io/r/inveniosoftware/invenio-records-files

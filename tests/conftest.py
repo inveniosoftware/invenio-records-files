@@ -55,7 +55,7 @@ def docid_record_type_endpoint():
 
 @pytest.fixture()
 def RecordWithBucketCreation():
-    """Add _create_bucket implementation to record class"""
+    """Add _create_bucket implementation to record class."""
     from invenio_records_files.api import Record
 
     module_name = 'test_api'
@@ -67,7 +67,7 @@ def RecordWithBucketCreation():
 
 @pytest.fixture()
 def RecordWithoutFilesCreation():
-    """Add _create_bucket implementation to record class"""
+    """Add _create_bucket implementation to record class."""
     from invenio_records.api import Record as RecordWithoutFiles
 
     module_name = 'test_api_no_files'
