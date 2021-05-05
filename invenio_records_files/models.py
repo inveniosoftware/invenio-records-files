@@ -35,6 +35,7 @@ class RecordsBuckets(db.Model):
         db.ForeignKey(Bucket.id),
         primary_key=True,
         nullable=False,
+        index=True,
     )
     """Bucket related with the record."""
 
