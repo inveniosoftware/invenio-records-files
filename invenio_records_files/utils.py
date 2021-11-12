@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import abort, request
+from flask import abort, request, current_app
 from invenio_files_rest.models import ObjectVersion
 from invenio_files_rest.views import ObjectResource
 from invenio_records.errors import MissingModelError
@@ -100,9 +100,17 @@ def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
         abort(404)
 
     obj = fileobj.obj
+    as_attachment = 'download' in request.args
 
     # Check permissions
     ObjectResource.check_object_permission(obj)
+
+    # Use X-Sendfile if avilable
+    if current_app.config['FILES_REST_XSENDFILE_ENABLED']:
+        response_constructor = \
+            current_app.config['FILES_REST_XSENDFILE_RESPONSE_FUNC']
+        return response_constructor(
+            obj.bucket, obj, download=as_attachment)
 
     # Send file.
     return ObjectResource.send_object(
@@ -113,5 +121,5 @@ def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
             'pid_type': pid.pid_type,
             'pid_value': pid.pid_value,
         },
-        as_attachment=('download' in request.args)
+        as_attachment=as_attachment
     )
