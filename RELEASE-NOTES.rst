@@ -1,8 +1,8 @@
-=================================
- Invenio-Records-Files v1.0.0a11
-=================================
+=======================================
+ Invenio-Records-Files v1.0.0a11.post1
+=======================================
 
-Invenio-Records-Files v1.0.0a11 was released on May 30, 2018.
+Invenio-Records-Files v1.0.0a11.post1 was released on November 12, 2021.
 
 About
 -----
@@ -19,7 +19,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-records-files==1.0.0a11
+   $ pip install invenio-records-files==1.0.0a11.post1
 
 Documentation
 -------------
