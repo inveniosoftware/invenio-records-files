@@ -72,7 +72,7 @@ class FileObject(object):
             {
                 "bucket": str(self.obj.bucket_id),
                 "checksum": self.obj.file.checksum,
-                "file_id": str(self.obj.file.id),
+                "file_id": str(self.obj.file_id),
                 "key": self.obj.key,  # IMPORTANT it must stay here!
                 "size": self.obj.file.size,
                 "version_id": str(self.obj.version_id),

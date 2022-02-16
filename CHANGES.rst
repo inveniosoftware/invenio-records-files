@@ -10,10 +10,14 @@
 Changes
 =======
 
+Version 1.2.2 (released 2022-01-31)
+
+- Adds index to bucket_id for faster queries.
+
 Version 1.2.1 (released 2019-11-21)
 
-- increase invenio-files-rest version to provide signals for d
-  eletion and uploading files
+- increase invenio-files-rest version to provide signals for deletion and
+  uploading files
 
 Version 1.2.0 (released 2019-11-19)
 

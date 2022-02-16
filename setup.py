@@ -44,13 +44,10 @@ for name, reqs in extras_require.items():
         continue
     extras_require['all'].extend(reqs)
 
-setup_requires = [
-    'pytest-runner>=2.6.2',
-]
 
 install_requires = [
-    'invenio-base>=1.2.2',
-    'invenio-files-rest>=1.0.5',
+    'invenio-base>=1.2.5',
+    'invenio-files-rest>=1.3.0',
     'invenio-records>=1.0.0',
     'invenio-records-rest>=1.6.3',
 ]
@@ -101,7 +98,6 @@ setup(
     },
     extras_require=extras_require,
     install_requires=install_requires,
-    setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
         'Environment :: Web Environment',
