@@ -87,6 +87,7 @@ def _writable(method):
     :param method: Method to be decorated.
     :returns: Function decorated.
     """
+
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         """Send record for indexing.
@@ -142,9 +143,7 @@ class FilesIterator(object):
 
     def __contains__(self, key):
         """Test if file exists."""
-        return (
-            ObjectVersion.get_by_bucket(self.bucket).filter_by(key=key).count()
-        )
+        return ObjectVersion.get_by_bucket(self.bucket).filter_by(key=key).count()
 
     def __getitem__(self, key):
         """Get a specific file."""
@@ -166,9 +165,7 @@ class FilesIterator(object):
         """Add file inside a deposit."""
         with db.session.begin_nested():
             # save the file
-            obj = ObjectVersion.create(
-                bucket=self.bucket, key=key, stream=stream
-            )
+            obj = ObjectVersion.create(bucket=self.bucket, key=key, stream=stream)
             self.filesmap[key] = self.file_cls(obj, {}).dumps()
             self.flush()
 
@@ -192,10 +189,7 @@ class FilesIterator(object):
         # Support sorting by file_ids or keys.
         files = {str(f_.file_id): f_.key for f_ in self}
         self.filesmap = OrderedDict(
-            [
-                (files.get(id_, id_), self[files.get(id_, id_)].dumps())
-                for id_ in ids
-            ]
+            [(files.get(id_, id_), self[files.get(id_, id_)].dumps()) for id_ in ids]
         )
         self.flush()
 
@@ -266,9 +260,7 @@ class FilesMixin(object):
         if self.model is None:
             raise MissingModelError()
 
-        records_buckets = RecordsBuckets.query.filter_by(
-            record_id=self.id
-        ).first()
+        records_buckets = RecordsBuckets.query.filter_by(record_id=self.id).first()
 
         if not records_buckets:
             return None

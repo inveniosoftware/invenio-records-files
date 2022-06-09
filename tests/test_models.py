@@ -20,9 +20,10 @@ from invenio_records_files.api import Record
 from invenio_records_files.models import RecordsBuckets
 
 
-@pytest.mark.parametrize('force,num_of_recordbuckets', [(False, 1), (True, 0)])
-def test_cascade_action_record_delete(app, db, location, record, generic_file,
-                                      force, num_of_recordbuckets):
+@pytest.mark.parametrize("force,num_of_recordbuckets", [(False, 1), (True, 0)])
+def test_cascade_action_record_delete(
+    app, db, location, record, generic_file, force, num_of_recordbuckets
+):
     """Test cascade action on record delete, with force false."""
     record_id = record.id
     bucket_id = record.files.bucket.id
@@ -45,8 +46,7 @@ def test_cascade_action_record_delete(app, db, location, record, generic_file,
     assert ObjectVersion.get(bucket=bucket_id, key=generic_file)
 
 
-def test_creating_missing_bucket(
-        app, db, client, location, RecordWithBucketCreation):
-    record = RecordWithBucketCreation.create({'title': 'fuu'})
-    record.files = {'test.txt': BytesIO(b'Test file data')}
-    assert 'test.txt' in record.files
+def test_creating_missing_bucket(app, db, client, location, RecordWithBucketCreation):
+    record = RecordWithBucketCreation.create({"title": "fuu"})
+    record.files = {"test.txt": BytesIO(b"Test file data")}
+    assert "test.txt" in record.files
