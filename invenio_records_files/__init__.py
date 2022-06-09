@@ -248,6 +248,7 @@ from __future__ import absolute_import, print_function
 
 from invenio_records_files.ext import InvenioRecordsFiles
 
-from .version import __version__
+
+__version__ = "1.2.1"
 
 __all__ = ('__version__', 'InvenioRecordsFiles')
