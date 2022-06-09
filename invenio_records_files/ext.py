@@ -25,10 +25,10 @@ class InvenioRecordsFiles(object):
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
-        app.extensions['invenio-records-files'] = self
+        app.extensions["invenio-records-files"] = self
 
     def init_config(self, app):
         """Initialize configuration."""
         for k in dir(config):
-            if k.startswith('RECORDS_FILES_'):
+            if k.startswith("RECORDS_FILES_"):
                 app.config.setdefault(k, getattr(config, k))

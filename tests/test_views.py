@@ -21,35 +21,30 @@ from invenio_records_files.views import create_blueprint_from_app
 def test_records_files_rest_integration(app, client, location, minted_record):
     """Test Records Files Views."""
     pid, record = minted_record
-    test_data = b'test example'
-    file_key = 'test.txt'
+    test_data = b"test example"
+    file_key = "test.txt"
     # Upload a file.
-    res = client.put(
-        '/records/{0}/files/{1}'.format(pid.id, file_key),
-        data=test_data)
+    res = client.put("/records/{0}/files/{1}".format(pid.id, file_key), data=test_data)
     assert res.status_code == 200
     # Get the list of the records files.
-    res = client.get('/records/{0}/files'.format(pid.id))
-    assert json.loads(
-        res.get_data(as_text=True))['contents'][0]['key'] == file_key
-    assert len(json.loads(res.get_data(as_text=True))['contents']) == 1
+    res = client.get("/records/{0}/files".format(pid.id))
+    assert json.loads(res.get_data(as_text=True))["contents"][0]["key"] == file_key
+    assert len(json.loads(res.get_data(as_text=True))["contents"]) == 1
 
     # Get the previously uploaded file.
-    res = client.get('/records/{0}/files/{1}'.format(pid.id, file_key))
+    res = client.get("/records/{0}/files/{1}".format(pid.id, file_key))
     assert res.data == test_data
 
     # Doc types shouldn't have files mounted as they are not configured.
-    res = client.get('/doc/{0}/files'.format(pid.id))
+    res = client.get("/doc/{0}/files".format(pid.id))
     assert res.status_code == 404
 
 
-def test_record_without_bucket(app, db, client, location,
-                               minted_record_no_bucket):
+def test_record_without_bucket(app, db, client, location, minted_record_no_bucket):
     """Test that there is no bucket creation if missing."""
     pid, record = minted_record_no_bucket
     res = client.put(
-        '/records/{0}/files/{1}'.format(pid.pid_value, 'test.txt'),
-        data=b'test example'
+        "/records/{0}/files/{1}".format(pid.pid_value, "test.txt"), data=b"test example"
     )
     assert res.status_code == 404
 
@@ -58,8 +53,8 @@ def test_record_no_files(app, db, client, location, minted_record_no_bucket):
     """Test that there is no bucket creation if missing."""
     pid, record = minted_record_no_bucket
     res = client.put(
-        '/records/{0}/nofiles/{1}'.format(pid.pid_value, 'test.txt'),
-        data=b'test example'
+        "/records/{0}/nofiles/{1}".format(pid.pid_value, "test.txt"),
+        data=b"test example",
     )
     assert res.status_code == 404
 
@@ -68,8 +63,10 @@ def test_misconfiguration_of_views(app):
     """Test error raised in case of misconfiguration of views."""
     app.config.update(
         RECORDS_FILES_REST_ENDPOINTS={
-            'RECORDS_REST_ENDPOINTS': {
-                'missing': 'files',
-            }})
+            "RECORDS_REST_ENDPOINTS": {
+                "missing": "files",
+            }
+        }
+    )
     with pytest.raises(ValueError):
         create_blueprint_from_app(app)

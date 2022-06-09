@@ -19,7 +19,7 @@ from sqlalchemy_utils.types import UUIDType
 class RecordsBuckets(db.Model):
     """Relationship between Records and Buckets."""
 
-    __tablename__ = 'records_buckets'
+    __tablename__ = "records_buckets"
 
     record_id = db.Column(
         UUIDType,

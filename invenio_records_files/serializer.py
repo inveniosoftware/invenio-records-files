@@ -9,8 +9,12 @@
 """REST API serializers based on Invenio-Files-Rest."""
 
 from flask import request, url_for
-from invenio_files_rest.serializer import Bucket, BucketSchema, \
-    ObjectVersion, ObjectVersionSchema
+from invenio_files_rest.serializer import (
+    Bucket,
+    BucketSchema,
+    ObjectVersion,
+    ObjectVersionSchema,
+)
 from marshmallow import post_dump
 
 
@@ -37,9 +41,7 @@ class RecordObjectVersionSchema(ObjectVersionSchema):
 
         if o.is_head and not o.deleted:
             url_for_uploads = "{0}?uploads".format(
-                url_for(
-                    url_path, pid_value=pid_value, key=o.key, _external=True
-                )
+                url_for(url_path, pid_value=pid_value, key=o.key, _external=True)
             )
             data.update({"uploads": url_for_uploads})
 
@@ -54,9 +56,7 @@ class RecordObjectVersionSchema(ObjectVersionSchema):
             data = {"contents": data}
             bucket = self.context.get("bucket")
             if bucket:
-                data.update(
-                    RecordBucketSchema(context=self.context).dump(bucket).data
-                )
+                data.update(RecordBucketSchema(context=self.context).dump(bucket).data)
             return data
 
 

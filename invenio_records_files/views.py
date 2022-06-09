@@ -38,8 +38,10 @@ def create_blueprint_from_app(app):
         for endpoint_prefix, files_path_name in iteritems(rec_files_mappings):
             if endpoint_prefix not in app.config[rest_endpoint_config]:
                 raise ValueError(
-                    'Endpoint {0} is not present in {1}'.format(
-                        endpoint_prefix, rest_endpoint_config))
+                    "Endpoint {0} is not present in {1}".format(
+                        endpoint_prefix, rest_endpoint_config
+                    )
+                )
             # e.g. /api/records/<recid>
             rec_item_route = app.config[rest_endpoint_config][endpoint_prefix][
                 "item_route"
@@ -71,9 +73,7 @@ def create_blueprint_from_app(app):
                 view_func=bucket_view,
             )
             records_files_blueprint.add_url_rule(
-                "{rec_item_route}{files_path_name}/<path:key>".format(
-                    **locals()
-                ),
+                "{rec_item_route}{files_path_name}/<path:key>".format(**locals()),
                 view_func=object_view,
             )
 
@@ -82,6 +82,7 @@ def create_blueprint_from_app(app):
 
 def pass_bucket_id(f):
     """Decorate to retrieve a bucket."""
+
     @wraps(f)
     def decorate(*args, **kwargs):
         """Get the bucket id from the record and pass it as kwarg."""

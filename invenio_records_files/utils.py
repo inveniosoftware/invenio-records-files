@@ -40,7 +40,7 @@ def record_file_factory(pid, record, filename):
     :returns: File object or ``None`` if not found.
     """
     try:
-        if not (hasattr(record, 'files') and record.files):
+        if not (hasattr(record, "files") and record.files):
             return None
     except MissingModelError:
         return None
@@ -76,9 +76,7 @@ def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
     """
     _record_file_factory = _record_file_factory or record_file_factory
     # Extract file from record.
-    fileobj = _record_file_factory(
-        pid, record, kwargs.get('filename')
-    )
+    fileobj = _record_file_factory(pid, record, kwargs.get("filename"))
 
     if not fileobj:
         abort(404)
@@ -90,12 +88,13 @@ def file_download_ui(pid, record, _record_file_factory=None, **kwargs):
 
     # Send file.
     return ObjectResource.send_object(
-        obj.bucket, obj,
-        expected_chksum=fileobj.get('checksum'),
+        obj.bucket,
+        obj,
+        expected_chksum=fileobj.get("checksum"),
         logger_data={
-            'bucket_id': obj.bucket_id,
-            'pid_type': pid.pid_type,
-            'pid_value': pid.pid_value,
+            "bucket_id": obj.bucket_id,
+            "pid_type": pid.pid_type,
+            "pid_value": pid.pid_value,
         },
-        as_attachment=('download' in request.args)
+        as_attachment=("download" in request.args),
     )
