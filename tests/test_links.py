@@ -16,8 +16,10 @@ from flask import url_for
 from invenio_records.models import RecordMetadata
 
 from invenio_records_files.api import RecordsBuckets
-from invenio_records_files.links import default_bucket_link_factory, \
-    default_record_files_links_factory
+from invenio_records_files.links import (
+    default_bucket_link_factory,
+    default_record_files_links_factory,
+)
 
 
 def test_bucket_link_factory_no_bucket(app, db, location, record):
