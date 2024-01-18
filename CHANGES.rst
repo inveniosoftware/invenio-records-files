@@ -10,6 +10,11 @@
 Changes
 =======
 
+Version 1.2.2 (released 2024-01-18)
+
+- add bucket_id index
+- migrate CI to gh actions
+
 Version 1.2.1 (released 2019-11-21)
 
 - increase invenio-files-rest version to provide signals for d
