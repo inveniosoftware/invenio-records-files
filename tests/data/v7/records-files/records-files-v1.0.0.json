@@ -1,0 +1,30 @@
+{
+  "mappings": {
+    "records-files-v1.0.0": {
+      "properties": {
+        "_files": {
+          "properties": {
+            "key": {
+              "type": "text"
+            },
+            "file_id": {
+              "type": "string"
+            },
+            "bucket": {
+              "type": "text"
+            },
+            "checksum": {
+              "type": "text"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "version_id": {
+              "type": "text"
+            }
+          }
+        }
+      }
+    }
+  }
+}
