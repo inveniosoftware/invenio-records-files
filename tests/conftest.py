@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2016-2019 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -11,13 +12,13 @@
 
 from __future__ import absolute_import, print_function
 
-import imp
 import os
 import shutil
 import sys
 import tempfile
 import uuid
 from copy import deepcopy
+from types import ModuleType
 
 import pytest
 from flask import Flask
@@ -59,7 +60,7 @@ def RecordWithBucketCreation():
     from invenio_records_files.api import Record
 
     module_name = "test_api"
-    test_api_module = imp.new_module(module_name)
+    test_api_module = ModuleType(module_name)
     test_api_module.Record = Record
     sys.modules[module_name] = test_api_module
     return Record
@@ -71,7 +72,7 @@ def RecordWithoutFilesCreation():
     from invenio_records.api import Record as RecordWithoutFiles
 
     module_name = "test_api_no_files"
-    test_api_module = imp.new_module(module_name)
+    test_api_module = ModuleType(module_name)
     test_api_module.RecordWithoutFiles = RecordWithoutFiles
     sys.modules[module_name] = test_api_module
     return RecordWithoutFiles
