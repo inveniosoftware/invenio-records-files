@@ -145,12 +145,12 @@ def client(app):
 @pytest.yield_fixture()
 def db(app):
     """Database fixture."""
-    if not database_exists(str(db_.engine.url)):
-        create_database(str(db_.engine.url))
+    if not database_exists(str(db_.engine.url.render_as_string(hide_password=False))):
+        create_database(str(db_.engine.url.render_as_string(hide_password=False)))
     db_.create_all()
     yield db_
     db_.session.remove()
-    drop_database(str(db_.engine.url))
+    drop_database(str(db_.engine.url.render_as_string(hide_password=False)))
 
 
 @pytest.fixture()
