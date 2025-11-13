@@ -17,7 +17,7 @@ history = open('CHANGES.rst').read()
 
 tests_require = [
     'invenio-indexer>=1.1.0',
-    'invenio-search[elasticsearch6]>=1.2.0',
+    'invenio-search[opensearch2]>=3.0.0',
     'mock>=1.3.0',
     'pytest-invenio>=1.4.0'
 ]
