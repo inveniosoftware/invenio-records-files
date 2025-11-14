@@ -29,4 +29,4 @@ jobs:
   Python:
     uses: inveniosoftware/workflows/.github/workflows/tests-python.yml@master
     with:
-      extras: "all,postgresql"
+      extras: "tests,postgresql,opensearch2"
