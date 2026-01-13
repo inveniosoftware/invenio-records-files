@@ -2,14 +2,13 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2016-2019 CERN.
+# Copyright (C) 2025 Northwestern University.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 
 """Test module."""
-
-from __future__ import absolute_import, print_function
 
 import pytest
 from invenio_files_rest.models import Bucket, ObjectVersion
@@ -45,8 +44,7 @@ def test_cascade_action_record_delete(app, db, location, record, generic_file,
     assert ObjectVersion.get(bucket=bucket_id, key=generic_file)
 
 
-def test_creating_missing_bucket(
-        app, db, client, location, RecordWithBucketCreation):
-    record = RecordWithBucketCreation.create({'title': 'fuu'})
+def test_creating_missing_bucket(app, db, client, location):
+    record = Record.create({"title": "fuu"})
     record.files = {'test.txt': BytesIO(b'Test file data')}
     assert 'test.txt' in record.files

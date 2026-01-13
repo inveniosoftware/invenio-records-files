@@ -16,9 +16,14 @@ Initialization
 --------------
 First create a Flask application:
 
+>>> import os
+>>> db_url = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite://')
 >>> from flask import Flask
 >>> app = Flask('myapp')
->>> app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+>>> app.config.update({
+...     'SQLALCHEMY_DATABASE_URI': db_url,
+...     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+... })
 
 Records-Files has no Flask extension, however it is dependent on
 `Invenio-Records <https://invenio-records.rtfd.io/>`_ and
