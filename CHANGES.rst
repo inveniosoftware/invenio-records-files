@@ -1,6 +1,7 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2016-2019 CERN.
+    Copyright (C) 2026 Graz University of Technology.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -9,6 +10,26 @@
 
 Changes
 =======
+
+Version v1.2.2 (released 2026-01-29)
+
+- fix(docs): not found attr
+- chore(black): update formatting to >= 26.0
+- chore(setup): to be backwards compatible
+- fix(tests): skip alembic test
+- global: add compatibility to sqlalchemy >= 2.0
+- fix: no module imp
+- fix: missing module data.v7
+- fix: sphinxwarning
+- setup: change to reusable workflows
+- fix: setuptools require underscores instead of dashes
+- global: clean test infrastructure
+- increase minimal python version to 3.7
+- move check_manifest configuration to setup.cfg.
+- fix docs compatibilty problem with Sphinx>=5.0.0
+- add .git-blame-ignore-revs
+- migrate to use black as opinionated auto formater
+- migrate setup.py to setup.cfg
 
 Version 1.2.2 (released 2024-01-18)
 
