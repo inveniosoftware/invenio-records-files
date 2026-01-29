@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2019 CERN.
+# Copyright (C) 2026 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -16,6 +17,7 @@ from invenio_files_rest.serializer import (
     ObjectVersionSchema,
 )
 from marshmallow import post_dump
+from marshmallow_utils.context import context_schema
 
 
 class RecordObjectVersionSchema(ObjectVersionSchema):
@@ -24,14 +26,16 @@ class RecordObjectVersionSchema(ObjectVersionSchema):
     def dump_links(self, o):
         """Dump links."""
         pid_value = request.view_args["pid_value"].value
-        url_path = ".{0}".format(self.context.get("view_name"))
+        view_name = context_schema.get().get("view_name")
+        url_path = f".{view_name}"
+
         params = {"versionId": o.version_id}
         url_for_self = url_for(
             url_path,
             pid_value=pid_value,
             key=o.key,
             _external=True,
-            **(params if not o.is_head or o.deleted else {})
+            **(params if not o.is_head or o.deleted else {}),
         )
         url_for_versions = url_for(
             url_path, pid_value=pid_value, key=o.key, _external=True, **params
@@ -54,9 +58,11 @@ class RecordObjectVersionSchema(ObjectVersionSchema):
             return data
         else:
             data = {"contents": data}
-            bucket = self.context.get("bucket")
+            bucket = context_schema.get().get("bucket", False)
             if bucket:
-                data.update(RecordBucketSchema(context=self.context).dump(bucket).data)
+                data.update(
+                    RecordBucketSchema().dump(bucket, context=context_schema.get()).data
+                )
             return data
 
 
@@ -66,7 +72,8 @@ class RecordBucketSchema(BucketSchema):
     def dump_links(self, o):
         """Dump links."""
         pid_value = request.view_args["pid_value"].value
-        url_path = ".{0}".format(self.context.get("view_name"))
+        view_name = context_schema.get().get("view_name")
+        url_path = f".{view_name}"
         url_for_self = url_for(url_path, pid_value=pid_value, _external=True)
         url_for_versions = "{0}?versions".format(url_for_self)
         url_for_uploads = "{0}?uploads".format(url_for_self)
