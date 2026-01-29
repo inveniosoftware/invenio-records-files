@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2016-2019 CERN.
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -333,3 +333,9 @@ intersphinx_mapping = {
 
 # Autodoc configuraton.
 autoclass_content = "both"
+
+nitpick_ignore = [
+    ("py:class", "Query"),
+    ("py:class", "t.ClassVar"),
+    ("py:attr", "query_class"),
+]
