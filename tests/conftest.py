@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2016-2019 CERN.
-# Copyright (C) 2025 Graz University of Technology.
+# Copyright (C) 2025-2026 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -78,7 +78,7 @@ def RecordWithoutFilesCreation():
     return RecordWithoutFiles
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def app(request, docid_record_type_endpoint):
     """Flask application fixture."""
     from invenio_records_files.api import Record as RecordFiles
@@ -135,14 +135,14 @@ def app(request, docid_record_type_endpoint):
     shutil.rmtree(instance_path)
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def client(app):
     """Get test client."""
     with app.test_client() as client:
         yield client
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def db(app):
     """Database fixture."""
     if not database_exists(str(db_.engine.url.render_as_string(hide_password=False))):
