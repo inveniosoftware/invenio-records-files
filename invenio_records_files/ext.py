@@ -8,7 +8,6 @@
 
 """Flask extension for the Invenio-Records-Files."""
 
-
 from __future__ import absolute_import, print_function
 
 from invenio_records_files import config
