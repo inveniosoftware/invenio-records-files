@@ -11,6 +11,11 @@
 Changes
 =======
 
+Version v3.0.0 (released 2026-05-29)
+
+- chore(setup): bump dependencies
+- fix: bad downstream dependency in alembic
+
 Version v2.0.0 (released 2026-01-30)
 
 - chore(context): apply marshmallow context change
