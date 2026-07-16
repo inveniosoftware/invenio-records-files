@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016-2019 CERN.
 # SPDX-FileCopyrightText: 2026 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 TU Wien.
 # SPDX-License-Identifier: MIT
 
 r"""Integration of records and files for Invenio.
@@ -244,6 +245,6 @@ from __future__ import absolute_import, print_function
 
 from invenio_records_files.ext import InvenioRecordsFiles
 
-__version__ = "4.0.0"
+__version__ = "4.0.1"
 
 __all__ = ("__version__", "InvenioRecordsFiles")
