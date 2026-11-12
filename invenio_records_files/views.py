@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2019 CERN.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 """Invenio-Records-Files REST integration."""
@@ -6,13 +7,12 @@
 from __future__ import absolute_import, print_function
 
 from functools import partial, wraps
+from urllib.parse import urljoin
 
 from flask import Blueprint
 from invenio_files_rest.serializer import json_serializer
 from invenio_files_rest.views import BucketResource, ObjectResource
 from invenio_records_rest.views import pass_record
-from six import iteritems
-from six.moves.urllib.parse import urljoin
 
 from .serializer import serializer_mapping
 
@@ -27,10 +27,10 @@ def create_blueprint_from_app(app):
         "invenio_records_files", __name__, url_prefix=""
     )
 
-    for rest_endpoint_config, rec_files_mappings in iteritems(
-        app.config["RECORDS_FILES_REST_ENDPOINTS"]
-    ):
-        for endpoint_prefix, files_path_name in iteritems(rec_files_mappings):
+    for rest_endpoint_config, rec_files_mappings in app.config[
+        "RECORDS_FILES_REST_ENDPOINTS"
+    ].items():
+        for endpoint_prefix, files_path_name in rec_files_mappings.items():
             if endpoint_prefix not in app.config[rest_endpoint_config]:
                 raise ValueError(
                     "Endpoint {0} is not present in {1}".format(
