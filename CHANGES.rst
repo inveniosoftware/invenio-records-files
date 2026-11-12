@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version v3.0.2 (released 2026-11-12)
+
+- chore: remove six
+
 Version v3.0.1 (released 2026-07-21)
 
 - chore(setup): migrate from setuptools to hatchling
