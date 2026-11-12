@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016-2019 CERN.
 # SPDX-FileCopyrightText: 2025-2026 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 
@@ -13,6 +14,7 @@ import sys
 import tempfile
 import uuid
 from copy import deepcopy
+from io import BytesIO
 from types import ModuleType
 
 import pytest
@@ -32,7 +34,6 @@ from invenio_records_rest.views import (
     create_blueprint_from_app as records_rest_create_blueprint_from_app,
 )
 from invenio_search import InvenioSearch
-from six import BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists, drop_database
 
 from invenio_records_files import InvenioRecordsFiles

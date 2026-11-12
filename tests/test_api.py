@@ -1,15 +1,17 @@
 # SPDX-FileCopyrightText: 2019 CERN.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 """Test API."""
 
 from __future__ import absolute_import, print_function
 
+from io import BytesIO
+
 import pytest
 from invenio_files_rest.errors import InvalidOperationError
 from invenio_files_rest.models import Bucket, ObjectVersion
 from invenio_records.errors import MissingModelError
-from six import BytesIO
 
 from invenio_records_files.api import Record
 
