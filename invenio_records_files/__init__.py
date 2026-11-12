@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2016-2019 CERN.
 # SPDX-FileCopyrightText: 2026 Graz University of Technology.
 # SPDX-FileCopyrightText: 2026 TU Wien.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 r"""Integration of records and files for Invenio.
@@ -75,7 +76,7 @@ Creating files
 --------------
 You are now ready to create you first file using the Invenio-Records-Files API:
 
->>> from six import BytesIO
+>>> from io import BytesIO
 >>> record.files['hello.txt'] = BytesIO(b'Hello, World')
 
 In the above example you created a file named ``hello.txt`` as a new object

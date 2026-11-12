@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2016-2019 CERN.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 
@@ -6,9 +7,10 @@
 
 from __future__ import absolute_import, print_function
 
+from io import BytesIO
+
 import pytest
 from invenio_files_rest.models import Bucket, ObjectVersion
-from six import BytesIO
 from sqlalchemy.orm.exc import NoResultFound
 
 from invenio_records_files.api import Record
